@@ -15,7 +15,7 @@
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Signals.h"
 
-#include "HiddenVariabilityCandidates.h"
+#include "Candidates.h"
 
 namespace vara {
 

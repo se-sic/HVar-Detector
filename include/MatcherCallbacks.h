@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <optional>
 
-#include "HiddenVariabilityMatchers.h"
+#include "Matchers.h"
 
 namespace vara {
 using namespace clang::ast_matchers;

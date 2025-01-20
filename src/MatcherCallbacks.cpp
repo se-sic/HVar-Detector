@@ -2,7 +2,7 @@
 // Created by abeltluk on 9/6/24.
 //
 
-#include "HiddenVariabilityMatcherCallbacks.h"
+#include "MatcherCallbacks.h"
 
 namespace vara {
 

@@ -1,7 +1,7 @@
 // Declares clang::SyntaxOnlyAction.
 
-#include "HiddenVariabilityMatcherCallbacks.h"
-#include "HiddenVariabilityMatchers.h"
+#include "MatcherCallbacks.h"
+#include "Matchers.h"
 
 #include <fstream>
 
