@@ -99,12 +99,6 @@ int main(int argc, const char **argv) {
     OutputPath.replace_filename(OutFile.Default.getValue());
   }
 
-  if (OutputPath.extension() != ".yml") {
-    llvm::outs()
-        << "Report file should be a '.yml' file! Extension will be changed.\n";
-    OutputPath.replace_extension(".yml");
-  }
-
   auto Err = Executor->get()->execute(newFrontendActionFactory(&Finder));
   if (Err) {
     llvm::errs() << llvm::toString(std::move(Err)) << "\n";

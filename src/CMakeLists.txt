@@ -15,5 +15,3 @@ target_link_libraries(
           clangTooling
           clangToolingRefactoring
 )
-
-install(TARGETS hidden-variability-finder RUNTIME DESTINATION bin)
