@@ -26,56 +26,61 @@ const auto AnyLiteralType =
           compoundLiteralExpr(), cxxBoolLiteral());
 
 const auto GlobalConstVarMatcher = // Match all variable declarations
-    varDecl(allOf(
-        // That use a built-in type
-        hasType(hasUnqualifiedDesugaredType(builtinType())),
-        // Only const qualified declarations
-        hasType(isConstQualified()),
-        // That are directly initialized with a literal expression
-        hasInitializer(AnyLiteralType),
-        // Only match declarations that are global to the namespace or
-        // translation unit
-        anyOf(hasParent(namespaceDecl()), hasParent(translationUnitDecl())),
-        // Ignore system headers
-        unless(isExpansionInSystemHeader())));
+    traverse(
+        clang::TK_IgnoreUnlessSpelledInSource,
+        varDecl(allOf(
+            // That use a built-in type
+            hasType(hasUnqualifiedDesugaredType(builtinType())),
+            // Only const qualified declarations
+            hasType(isConstQualified()),
+            // That are directly initialized with a literal expression
+            hasInitializer(AnyLiteralType),
+            // Only match declarations that are global to the namespace or
+            // translation unit
+            anyOf(hasParent(namespaceDecl()), hasParent(translationUnitDecl())),
+            // Ignore system headers
+            unless(isExpansionInSystemHeader()))));
 
 const auto LocalConstVarMatcher = // Match all variable declarations
-    varDecl(allOf(
-        // That use a built-in type
-        hasType(hasUnqualifiedDesugaredType(builtinType())),
-        // Only const qualified declarations
-        hasType(isConstQualified()),
-        // That are directly initialized with a literal expression
-        hasInitializer(AnyLiteralType),
-        // Ignore variable declarations in for-loop headers
-        unless(hasParent(declStmt(hasParent(forStmt())))),
-        // Ignore declarations that are global to the namespace or translation
-        // unit
-        unless(anyOf(hasParent(namespaceDecl()),
-                     hasParent(translationUnitDecl()),
-                     hasParent(recordDecl()))),
-        // Ignore includes from system headers
-        unless(isExpansionInSystemHeader())));
+    traverse(clang::TK_IgnoreUnlessSpelledInSource,
+             varDecl(allOf(
+                 // That use a built-in type
+                 hasType(hasUnqualifiedDesugaredType(builtinType())),
+                 // Only const qualified declarations
+                 hasType(isConstQualified()),
+                 // That are directly initialized with a literal expression
+                 hasInitializer(AnyLiteralType),
+                 // Ignore variable declarations in for-loop headers
+                 unless(hasParent(declStmt(hasParent(forStmt())))),
+                 // Ignore declarations that are global to the namespace or
+                 // translation unit
+                 unless(anyOf(hasParent(namespaceDecl()),
+                              hasParent(translationUnitDecl()),
+                              hasParent(recordDecl()))),
+                 // Ignore includes from system headers
+                 unless(isExpansionInSystemHeader()))));
 
 const auto ConstFieldMatcher = // Match all variable declarations
-    fieldDecl(allOf(
-        // That use a built-in type
-        hasType(hasUnqualifiedDesugaredType(builtinType())),
-        // Only const qualified declarations
-        hasType(isConstQualified()),
-        // That are directly initialized with a literal expression
-        hasInClassInitializer(AnyLiteralType),
-        // Only match fields in classes
-        hasParent(cxxRecordDecl()),
-        // Ignore system headers
-        unless(isExpansionInSystemHeader())));
+    traverse(clang::TK_IgnoreUnlessSpelledInSource,
+             fieldDecl(allOf(
+                 // That use a built-in type
+                 hasType(hasUnqualifiedDesugaredType(builtinType())),
+                 // Only const qualified declarations
+                 hasType(isConstQualified()),
+                 // That are directly initialized with a literal expression
+                 hasInClassInitializer(AnyLiteralType),
+                 // Only match fields in classes
+                 hasParent(cxxRecordDecl()),
+                 // Ignore system headers
+                 unless(isExpansionInSystemHeader()))));
 
 const auto
     TemplateLiteralMatcher = // Match Template instantiations using literals
     classTemplateSpecializationDecl( // It is not possible to directly match the
                                      // template parameter itself
-        allOf(hasAnyTemplateArgument(isIntegral()),
-              unless(isExpansionInSystemHeader())));
+        traverse(clang::TK_IgnoreUnlessSpelledInSource,
+                 allOf(hasAnyTemplateArgument(isIntegral()),
+                       unless(isExpansionInSystemHeader()))));
 
 } // namespace vara
 
