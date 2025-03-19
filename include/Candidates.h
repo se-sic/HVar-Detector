@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by abeltluk on 9/6/24.
 //
@@ -5,7 +7,7 @@
 #ifndef LLVM_HIDDENVARIABILITYCANDIDATES_H
 #define LLVM_HIDDENVARIABILITYCANDIDATES_H
 namespace vara {
-enum class CandidateType {
+enum class CandidateType : std::uint8_t {
   GlobalConstVar,
   LocalConstVar,
   ConstField,
@@ -13,28 +15,30 @@ enum class CandidateType {
   Unknown
 };
 
+struct CodeLocation {
+  std::string File;
+  uint32_t Lineno{};
+  uint32_t Colno{};
+};
+
 class CandidateBase {
 public:
   CandidateBase(std::string File, uint32_t Lineno, uint32_t Colno)
-      : File(File), Lineno(Lineno), Colno(Colno) {}
+      : Location{std::move(File), Lineno, Colno} {}
 
-  CandidateBase(){};
+  CandidateBase() = default;
 
   CandidateBase(const CandidateBase &) = default;
+  virtual ~CandidateBase() = default;
+  CandidateBase &operator=(const CandidateBase &) = default;
 
   void mapToYaml(llvm::yaml::IO &io) {
     // Map common properties
-    io.mapRequired("Filename", this->File);
-    io.mapRequired("Lineno", this->Lineno);
-    io.mapRequired("Colno", this->Colno);
+    io.mapRequired("Location", this->Location);
     this->mapAdditionalProperties(io);
   }
 
-  virtual ~CandidateBase(){};
-
-  std::string File;
-  uint32_t Lineno;
-  uint32_t Colno;
+  CodeLocation Location;
 
 protected:
   virtual void mapAdditionalProperties(llvm::yaml::IO &io){};
@@ -46,16 +50,18 @@ class TemplateLiteral : public CandidateBase {
 public:
   TemplateLiteral(std::string File, uint32_t Lineno, uint32_t Colno,
                   std::string TClassName, std::string TArgName)
-      : CandidateBase(File, Lineno, Colno), TClassName(TClassName),
-        TArgName(TArgName) {}
+      : CandidateBase(std::move(File), Lineno, Colno),
+        TClassName(std::move(TClassName)), TArgName(std::move(TArgName)) {}
 
-  TemplateLiteral(const TemplateLiteral &);
+  TemplateLiteral(const TemplateLiteral &) = default;
+  ~TemplateLiteral() override = default;
+  TemplateLiteral &operator=(const TemplateLiteral &) = default;
 
   std::string TClassName;
   std::string TArgName;
 
 protected:
-  virtual void mapAdditionalProperties(llvm::yaml::IO &io) override {
+  void mapAdditionalProperties(llvm::yaml::IO &io) override {
     io.mapRequired("TemplateClassName", this->TClassName);
     io.mapRequired("TemplateParameterName", this->TArgName);
   }
@@ -67,16 +73,19 @@ class HiddenVariable : public CandidateBase {
 public:
   HiddenVariable(std::string File, uint32_t Lineno, uint32_t Colno,
                  std::string QualType, std::string QualifiedName)
-      : CandidateBase(File, Lineno, Colno), QualType(QualType),
-        QualifiedName(QualifiedName) {}
+      : CandidateBase(std::move(File), Lineno, Colno),
+        QualType(std::move(QualType)), QualifiedName(std::move(QualifiedName)) {
+  }
 
-  HiddenVariable(const HiddenVariable &);
+  HiddenVariable(const HiddenVariable &) = default;
+  ~HiddenVariable() override = default;
+  HiddenVariable &operator=(const HiddenVariable &) = default;
 
   std::string QualType;
   std::string QualifiedName;
 
 protected:
-  virtual void mapAdditionalProperties(llvm::yaml::IO &io) override {
+  void mapAdditionalProperties(llvm::yaml::IO &io) override {
     io.mapRequired("Type", QualType);
     io.mapRequired("VarName", this->QualifiedName);
   }
@@ -89,15 +98,18 @@ public:
   HiddenField(std::string File, uint32_t Lineno, uint32_t Colno,
               std::string QualType, std::string QualifiedName,
               std::string ClassName)
-      : HiddenVariable(File, Lineno, Colno, QualType, QualifiedName),
-        ClassName(ClassName) {}
+      : HiddenVariable(std::move(File), Lineno, Colno, std::move(QualType),
+                       std::move(QualifiedName)),
+        ClassName(std::move(ClassName)) {}
 
   HiddenField(const HiddenField &Other) = default;
+  ~HiddenField() override = default;
+  HiddenField &operator=(const HiddenField &Other) = default;
 
   std::string ClassName;
 
 protected:
-  virtual void mapAdditionalProperties(llvm::yaml::IO &io) override {
+  void mapAdditionalProperties(llvm::yaml::IO &io) override {
     HiddenVariable::mapAdditionalProperties(io);
     io.mapRequired("ClassName", this->ClassName);
   }
@@ -141,4 +153,12 @@ inline CandidateType fromString(std::string s) {
 }
 
 } // namespace vara
+
+template <> struct llvm::yaml::MappingTraits<vara::CodeLocation> {
+  static void mapping(IO &io, vara::CodeLocation &codeLocation) {
+    io.mapRequired("Filename", codeLocation.File);
+    io.mapRequired("Lineno", codeLocation.Lineno);
+    io.mapRequired("Colno", codeLocation.Colno);
+  }
+};
 #endif // LLVM_HIDDENVARIABILITYCANDIDATES_H

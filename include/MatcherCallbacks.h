@@ -23,7 +23,7 @@ public:
   virtual void run(const MatchFinder::MatchResult &Result) override = 0;
 
 protected:
-  std::optional<vara::CandidateBase>
+  std::optional<vara::CodeLocation>
   parseLocationFromDecl(const clang::Decl *D, clang::SourceManager *SM) {
     if (D && D->getBeginLoc().isValid() && D->getBeginLoc().isFileID()) {
 
@@ -49,7 +49,7 @@ protected:
         FileName = RelativeFilePath.generic_string();
       }
 
-      return vara::CandidateBase(FileName.c_str(), Lineno, Colno);
+      return vara::CodeLocation{FileName.c_str(), Lineno, Colno};
     }
 
     return std::nullopt;

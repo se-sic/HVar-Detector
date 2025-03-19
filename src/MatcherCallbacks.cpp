@@ -57,7 +57,7 @@ void TemplateLiteralMatcherCallback::run(
       FileName = RelativeFilePath.generic_string();
     }
 
-    auto BaseLocation = vara::CandidateBase(FileName.c_str(), Lineno, Colno);
+    auto BaseLocation = vara::CodeLocation{FileName.c_str(), Lineno, Colno};
 
     const std::string TClassName = TSpec->getNameAsString();
 
