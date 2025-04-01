@@ -6,13 +6,10 @@
 #define HIDDENCONFIGURABILITYMATCHERS_H
 
 #include "clang/Frontend/FrontendActions.h"
-#include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
 
 #include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/Tooling/Execution.h"
 #include "clang/Tooling/Refactoring/AtomicChange.h"
-#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Signals.h"
 
 #include "Candidates.h"
@@ -29,16 +26,9 @@ const auto GlobalConstVarMatcher = // Match all variable declarations
     traverse(
         clang::TK_IgnoreUnlessSpelledInSource,
         varDecl(allOf(
-            // That use a built-in type
             hasType(hasUnqualifiedDesugaredType(builtinType())),
-            // Only const qualified declarations
-            hasType(isConstQualified()),
-            // That are directly initialized with a literal expression
-            hasInitializer(AnyLiteralType),
-            // Only match declarations that are global to the namespace or
-            // translation unit
+            hasType(isConstQualified()), hasInitializer(AnyLiteralType),
             anyOf(hasParent(namespaceDecl()), hasParent(translationUnitDecl())),
-            // Ignore system headers
             unless(isExpansionInSystemHeader()))));
 
 const auto LocalConstVarMatcher = // Match all variable declarations
@@ -121,4 +111,5 @@ template <> struct llvm::yaml::CustomMappingTraits<vara::ResultMapTy> {
 };
 
 LLVM_YAML_IS_SEQUENCE_VECTOR(std::shared_ptr<vara::CandidateBase>)
+LLVM_YAML_IS_SEQUENCE_VECTOR(vara::CodeLocation)
 #endif // HIDDENCONFIGURABILITYMATCHERS_H

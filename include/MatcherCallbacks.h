@@ -4,10 +4,17 @@
 
 #ifndef LLVM_HIDDENVARIABILITYMATCHERCALLBACKS_H
 #define LLVM_HIDDENVARIABILITYMATCHERCALLBACKS_H
+#include <clang/Tooling/Execution.h>
 #include <filesystem>
+#include <map>
+#include <memory>
 #include <optional>
 
 #include "Matchers.h"
+#include "clang/AST/Decl.h"
+#include "clang/AST/Expr.h"
+#include "clang/ASTMatchers/ASTMatchers.h"
+#include "llvm/Support/Casting.h"
 
 namespace vara {
 using namespace clang::ast_matchers;
@@ -16,47 +23,14 @@ using namespace clang::tooling;
 class HiddenVariabilityMatcherCallback : public MatchFinder::MatchCallback {
 public:
   HiddenVariabilityMatcherCallback(
-      ExecutionContext &Context, vara::ResultMapTy &Results,
+      ExecutionContext &Context,
       std::optional<std::filesystem::path> ProjectRoot = std::nullopt)
-      : Context(Context), Results(Results), ProjectRoot(ProjectRoot) {}
+      : Context(Context), ProjectRoot(ProjectRoot) {}
 
-  virtual void run(const MatchFinder::MatchResult &Result) override = 0;
+  void run(const MatchFinder::MatchResult &Result) override = 0;
 
-protected:
-  std::optional<vara::CodeLocation>
-  parseLocationFromDecl(const clang::Decl *D, clang::SourceManager *SM) {
-    if (D && D->getBeginLoc().isValid() && D->getBeginLoc().isFileID()) {
-
-      // Parsing of file name, line and column taken from SourceLocation::print
-
-      const clang::PresumedLoc PLoc = SM->getPresumedLoc(D->getBeginLoc());
-
-      if (PLoc.isInvalid()) {
-        return std::nullopt;
-      }
-
-      llvm::SmallString<256> FileName(PLoc.getFilename());
-      const uint32_t Lineno = PLoc.getLine();
-      const uint32_t Colno = PLoc.getColumn();
-
-      if (this->ProjectRoot.has_value()) {
-        SM->getFileManager().makeAbsolutePath(FileName);
-        std::filesystem::path AbsoluteFilePath(FileName.c_str());
-
-        auto RelativeFilePath = std::filesystem::relative(
-            AbsoluteFilePath, this->ProjectRoot.value());
-
-        FileName = RelativeFilePath.generic_string();
-      }
-
-      return vara::CodeLocation{FileName.c_str(), Lineno, Colno};
-    }
-
-    return std::nullopt;
-  }
-
+  virtual void mapResults(vara::ResultMapTy &Results) = 0;
   ExecutionContext &Context;
-  vara::ResultMapTy &Results;
   std::optional<std::filesystem::path> ProjectRoot;
 };
 
@@ -64,54 +38,97 @@ template <vara::CandidateType CType>
 class VarDeclMatcherCallback : public HiddenVariabilityMatcherCallback {
 public:
   VarDeclMatcherCallback(
-      ExecutionContext &Context, vara::ResultMapTy &Results,
+      ExecutionContext &Context,
       std::optional<std::filesystem::path> ProjectRoot = std::nullopt)
-      : HiddenVariabilityMatcherCallback(Context, Results, ProjectRoot) {
-    // Ensure that there is at least an empty vector in the results map
-    Results[CType];
-  }
+      : HiddenVariabilityMatcherCallback(Context, ProjectRoot) {}
 
-  virtual void run(const MatchFinder::MatchResult &Result) override {
-    auto *D = Result.Nodes.getNodeAs<clang::VarDecl>(vara::toString(CType));
-    assert(D);
+  void run(const MatchFinder::MatchResult &Result) override {
+    if (const auto *D =
+            Result.Nodes.getNodeAs<clang::VarDecl>(vara::toString(CType))) {
+      assert(D);
 
-    auto BaseLoc = this->parseLocationFromDecl(D, Result.SourceManager);
+      auto BaseLoc = parseLocation(
+          D->getBeginLoc(), Result.Context->getSourceManager(), ProjectRoot);
 
-    if (!BaseLoc.has_value()) {
-      return;
+      if (!BaseLoc.has_value()) {
+        return;
+      }
+
+      Locations[BaseLoc.value()] = HiddenVariable(
+          BaseLoc.value().File, BaseLoc.value().Lineno, BaseLoc.value().Colno,
+          D->getType().getDesugaredType(*Result.Context).getAsString(),
+          D->getQualifiedNameAsString());
+
+      // Add Matcher for usages of variable
+      auto RefMatcher = declRefExpr(to(varDecl(equalsNode(D)))).bind("varRef");
+      MatchFinder Finder;
+      Finder.addMatcher(RefMatcher, this);
+      Finder.matchAST(*Result.Context);
+
+    } else if (const auto *DRE =
+                   Result.Nodes.getNodeAs<clang::DeclRefExpr>("varRef")) {
+      if (const auto *VD = llvm::dyn_cast<clang::VarDecl>(DRE->getDecl())) {
+        auto DeclLocation = parseLocation(
+            VD->getBeginLoc(), Result.Context->getSourceManager(), ProjectRoot);
+        auto UsageLocation =
+            parseLocation(DRE->getBeginLoc(),
+                          Result.Context->getSourceManager(), ProjectRoot);
+
+        if (!(UsageLocation && DeclLocation)) {
+          return;
+        }
+
+        if (Locations.find(DeclLocation.value()) == Locations.end()) {
+          return;
+        }
+
+        Locations[DeclLocation.value()].UsageLocations.push_back(
+            UsageLocation.value());
+      }
     }
-
-    Results[CType].push_back(std::make_shared<vara::HiddenVariable>(
-        BaseLoc.value().File, BaseLoc.value().Lineno, BaseLoc.value().Colno,
-        D->getType().getDesugaredType(*Result.Context).getAsString(),
-        D->getQualifiedNameAsString()));
   }
+
+  void mapResults(vara::ResultMapTy &Results) override {
+    Results[CType];
+
+    for (const auto &[_, HiddenVar] : Locations) {
+      Results[CType].push_back(
+          std::make_shared<vara::HiddenVariable>(HiddenVar));
+    }
+  };
+
+private:
+  std::map<const CodeLocation, HiddenVariable> Locations;
 };
 
 class FieldDeclMatcherCallback : public HiddenVariabilityMatcherCallback {
 public:
   FieldDeclMatcherCallback(
-      ExecutionContext &Context, vara::ResultMapTy &Results,
+      ExecutionContext &Context,
       std::optional<std::filesystem::path> ProjectRoot = std::nullopt)
-      : HiddenVariabilityMatcherCallback(Context, Results, ProjectRoot) {
-    // Ensure that there is at least an empty vector in the results map
-    Results[vara::CandidateType::ConstField];
-  }
+      : HiddenVariabilityMatcherCallback(Context, std::move(ProjectRoot)) {}
 
-  virtual void run(const MatchFinder::MatchResult &Result) override;
+  void run(const MatchFinder::MatchResult &Result) override;
+
+  void mapResults(vara::ResultMapTy &Results) override;
+
+private:
+  std::map<const CodeLocation, HiddenField> Locations;
 };
 
 class TemplateLiteralMatcherCallback : public HiddenVariabilityMatcherCallback {
 public:
   TemplateLiteralMatcherCallback(
-      ExecutionContext &Context, vara::ResultMapTy &Results,
+      ExecutionContext &Context,
       std::optional<std::filesystem::path> ProjectRoot = std::nullopt)
-      : HiddenVariabilityMatcherCallback(Context, Results, ProjectRoot) {
-    // Ensure that there is at least an empty vector in the results map
-    Results[vara::CandidateType::TemplateLiteral];
-  }
+      : HiddenVariabilityMatcherCallback(Context, ProjectRoot) {}
 
-  virtual void run(const MatchFinder::MatchResult &Result) override;
+  void run(const MatchFinder::MatchResult &Result) override;
+
+  void mapResults(vara::ResultMapTy &Results) override;
+
+private:
+  std::map<const CodeLocation, TemplateLiteral> Locations;
 };
 } // namespace vara
 #endif // LLVM_HIDDENVARIABILITYMATCHERCALLBACKS_H

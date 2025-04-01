@@ -63,18 +63,18 @@ int main(int argc, const char **argv) {
   // TODO: Refactor this with some proper registry such that it can easily be
   // extended with new patterns
   VarDeclMatcherCallback<vara::CandidateType::GlobalConstVar>
-      GlobalConstVarCallback(*Executor->get()->getExecutionContext(), Results,
+      GlobalConstVarCallback(*Executor->get()->getExecutionContext(),
                              RootDirectory);
 
   VarDeclMatcherCallback<vara::CandidateType::LocalConstVar>
-      LocalConstVarCallback(*Executor->get()->getExecutionContext(), Results,
+      LocalConstVarCallback(*Executor->get()->getExecutionContext(),
                             RootDirectory);
 
   FieldDeclMatcherCallback ConstFieldMatcherCallback(
-      *Executor->get()->getExecutionContext(), Results, RootDirectory);
+      *Executor->get()->getExecutionContext(), RootDirectory);
 
   TemplateLiteralMatcherCallback TemplateLiteralMatcherCB(
-      *Executor->get()->getExecutionContext(), Results, RootDirectory);
+      *Executor->get()->getExecutionContext(), RootDirectory);
 
   Finder.addMatcher(vara::GlobalConstVarMatcher.bind(
                         vara::toString(vara::CandidateType::GlobalConstVar)),
@@ -103,6 +103,12 @@ int main(int argc, const char **argv) {
   if (Err) {
     llvm::errs() << llvm::toString(std::move(Err)) << "\n";
   }
+
+  // TODO
+  LocalConstVarCallback.mapResults(Results);
+  GlobalConstVarCallback.mapResults(Results);
+  ConstFieldMatcherCallback.mapResults(Results);
+  TemplateLiteralMatcherCB.mapResults(Results);
 
   std::error_code EC;
   raw_fd_ostream Ostream(OutputPath.native(), EC);

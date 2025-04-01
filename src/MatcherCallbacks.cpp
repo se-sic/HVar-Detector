@@ -7,81 +7,135 @@
 namespace vara {
 
 void FieldDeclMatcherCallback::run(const MatchFinder::MatchResult &Result) {
+  if (const auto *FieldDecl = Result.Nodes.getNodeAs<clang::FieldDecl>(
+          vara::toString(CandidateType::ConstField))) {
+    // Match Declaration
+    if (FieldDecl->getBeginLoc().isValid() &&
+        FieldDecl->getBeginLoc().isFileID()) {
+      auto BaseLocation =
+          parseLocation(FieldDecl->getBeginLoc(),
+                        Result.Context->getSourceManager(), ProjectRoot);
 
-  auto *FieldDecl = Result.Nodes.getNodeAs<clang::FieldDecl>(
-      vara::toString(CandidateType::ConstField));
-  assert(FieldDecl);
-  if (FieldDecl->getBeginLoc().isValid() &&
-      FieldDecl->getBeginLoc().isFileID()) {
-    auto BaseLocation =
-        this->parseLocationFromDecl(FieldDecl, Result.SourceManager);
+      if (!BaseLocation.has_value()) {
+        return;
+      }
 
-    if (!BaseLocation.has_value()) {
+      std::string ClassName = "<unknown>";
+
+      if (const auto *recDecl = FieldDecl->getParent()) {
+        ClassName = recDecl->getNameAsString();
+      }
+
+      this->Locations[BaseLocation.value()] = HiddenField(
+          BaseLocation.value().File, BaseLocation.value().Lineno,
+          BaseLocation.value().Colno,
+          FieldDecl->getType().getDesugaredType(*Result.Context).getAsString(),
+          FieldDecl->getQualifiedNameAsString(), ClassName);
+
+      auto UsageMatcher = memberExpr(member(fieldDecl(equalsNode(FieldDecl))))
+                              .bind("memberUsage");
+      MatchFinder MF;
+      MF.addMatcher(UsageMatcher, this);
+      MF.matchAST(*Result.Context);
+    }
+  } else if (const auto *ME =
+                 Result.Nodes.getNodeAs<clang::MemberExpr>("memberUsage")) {
+    const auto *FD = llvm::dyn_cast<clang::FieldDecl>(ME->getMemberDecl());
+
+    if (!FD) {
       return;
     }
 
-    std::string ClassName = "<unknown>";
+    auto UsageLocation = parseLocation(
+        ME->getBeginLoc(), Result.Context->getSourceManager(), ProjectRoot);
+    auto FieldLocation = parseLocation(
+        FD->getBeginLoc(), Result.Context->getSourceManager(), ProjectRoot);
 
-    if (const auto *recDecl = FieldDecl->getParent()) {
-      ClassName = recDecl->getNameAsString();
+    if (!(UsageLocation.has_value() && FieldLocation.has_value())) {
+      return;
     }
 
-    Results[CandidateType::ConstField].push_back(std::make_shared<HiddenField>(
-        BaseLocation.value().File, BaseLocation.value().Lineno,
-        BaseLocation.value().Colno,
-        FieldDecl->getType().getDesugaredType(*Result.Context).getAsString(),
-        FieldDecl->getQualifiedNameAsString(), ClassName));
+    if (Locations.find(FieldLocation.value()) == Locations.end()) {
+      return;
+    }
+
+    Locations[FieldLocation.value()].UsageLocations.push_back(
+        UsageLocation.value());
+  }
+}
+
+void FieldDeclMatcherCallback::mapResults(vara::ResultMapTy &Results) {
+  // Ensure that there is at least an empty vector in the results map
+  Results[vara::CandidateType::ConstField];
+
+  for (const auto &[_, HF] : Locations) {
+    Results[vara::CandidateType::ConstField].emplace_back(
+        std::make_shared<HiddenField>(HF));
   }
 }
 
 void TemplateLiteralMatcherCallback::run(
     const MatchFinder::MatchResult &Result) {
-  auto *TSpec = Result.Nodes.getNodeAs<clang::ClassTemplateSpecializationDecl>(
-      vara::toString(CandidateType::TemplateLiteral));
-  assert(TSpec);
-  auto SL = TSpec->getPointOfInstantiation();
-  if (SL.isValid() && SL.isFileID()) {
-    auto PLoc = Result.SourceManager->getPresumedLoc(SL);
+  if (auto *TSpec =
+          Result.Nodes.getNodeAs<clang::ClassTemplateSpecializationDecl>(
+              vara::toString(CandidateType::TemplateLiteral))) {
+    assert(TSpec);
+    auto SL = TSpec->getPointOfInstantiation();
+    if (SL.isValid() && SL.isFileID()) {
+      auto PLoc = Result.SourceManager->getPresumedLoc(SL);
 
-    llvm::SmallString<256> FileName(PLoc.getFilename());
-    const uint32_t Lineno = PLoc.getLine();
-    const uint32_t Colno = PLoc.getColumn();
+      llvm::SmallString<256> FileName(PLoc.getFilename());
+      const uint32_t Lineno = PLoc.getLine();
+      const uint32_t Colno = PLoc.getColumn();
 
-    if (this->ProjectRoot.has_value()) {
-      Result.SourceManager->getFileManager().makeAbsolutePath(FileName);
-      std::filesystem::path AbsoluteFilePath(FileName.c_str());
+      if (this->ProjectRoot.has_value()) {
+        Result.SourceManager->getFileManager().makeAbsolutePath(FileName);
+        std::filesystem::path AbsoluteFilePath(FileName.c_str());
 
-      auto RelativeFilePath = std::filesystem::relative(
-          AbsoluteFilePath, this->ProjectRoot.value());
+        auto RelativeFilePath = std::filesystem::relative(
+            AbsoluteFilePath, this->ProjectRoot.value());
 
-      FileName = RelativeFilePath.generic_string();
-    }
-
-    auto BaseLocation = vara::CodeLocation{FileName.c_str(), Lineno, Colno};
-
-    const std::string TClassName = TSpec->getNameAsString();
-
-    // We need to manually extract the relevant template parameter(s)
-    const auto *TDeclParams =
-        TSpec->getSpecializedTemplate()->getTemplateParameters();
-    const auto &TSpecArgs = TSpec->getTemplateArgs();
-
-    for (size_t ArgIndex = 0;
-         ArgIndex < TDeclParams->size() && ArgIndex < TSpecArgs.size();
-         ++ArgIndex) {
-      if (TSpecArgs[ArgIndex].getKind() !=
-          clang::TemplateArgument::ArgKind::Integral) {
-        continue;
+        FileName = RelativeFilePath.generic_string();
       }
 
-      const std::string TParamName =
-          TDeclParams->getParam(ArgIndex)->getNameAsString();
+      auto BaseLocation = vara::CodeLocation{FileName.c_str(), Lineno, Colno};
 
-      Results[CandidateType::TemplateLiteral].push_back(
-          std::make_shared<TemplateLiteral>(
-              BaseLocation.File, BaseLocation.Lineno, BaseLocation.Colno,
-              TClassName, TParamName));
+      const std::string TClassName = TSpec->getNameAsString();
+
+      // We need to manually extract the relevant template parameter(s)
+      const auto *TDeclParams =
+          TSpec->getSpecializedTemplate()->getTemplateParameters();
+      const auto &TSpecArgs = TSpec->getTemplateArgs();
+
+      for (size_t ArgIndex = 0;
+           ArgIndex < TDeclParams->size() && ArgIndex < TSpecArgs.size();
+           ++ArgIndex) {
+        if (TSpecArgs[ArgIndex].getKind() !=
+            clang::TemplateArgument::ArgKind::Integral) {
+          continue;
+        }
+
+        const std::string TParamName =
+            TDeclParams->getParam(ArgIndex)->getNameAsString();
+
+        Locations[BaseLocation] =
+            TemplateLiteral(BaseLocation.File, BaseLocation.Lineno,
+                            BaseLocation.Colno, TClassName, TParamName);
+        // TODO: Matcher for usage locations
+      }
     }
   }
+  // TODO: Usage Locations
 }
+
+void TemplateLiteralMatcherCallback::mapResults(vara::ResultMapTy &Results) {
+  // Ensure that there is at least an empty vector in the results map
+  Results[vara::CandidateType::TemplateLiteral];
+
+  for (const auto &[_, TL] : Locations) {
+    Results[vara::CandidateType::TemplateLiteral].emplace_back(
+        std::make_shared<TemplateLiteral>(TL));
+  }
+}
+
 } // namespace vara

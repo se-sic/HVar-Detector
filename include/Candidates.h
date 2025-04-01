@@ -1,3 +1,4 @@
+#include <set>
 #include <utility>
 
 //
@@ -19,12 +20,53 @@ struct CodeLocation {
   std::string File;
   uint32_t Lineno{};
   uint32_t Colno{};
+
+  friend bool operator<(const CodeLocation &lhs, const CodeLocation &rhs) {
+    return std::tie(lhs.File, lhs.Lineno, lhs.Colno) <
+           std::tie(rhs.File, rhs.Lineno, rhs.Colno);
+  }
 };
+
+static std::optional<vara::CodeLocation>
+parseLocation(const clang::SourceLocation &SL, clang::SourceManager &SM,
+              std::optional<std::filesystem::path> ProjectRoot) {
+  if (SL.isValid() && SL.isFileID()) {
+    // Parsing of file name, line and column taken from SourceLocation::print
+
+    clang::FullSourceLoc FLoc(SL, SM);
+    if (FLoc.isInvalid()) {
+      return std::nullopt;
+    }
+
+    llvm::SmallString<256> FileName(SM.getFilename(SL));
+    const uint32_t Lineno = FLoc.getSpellingLineNumber();
+    const uint32_t Colno = FLoc.getSpellingColumnNumber();
+
+    if (ProjectRoot.has_value()) {
+      SM.getFileManager().makeAbsolutePath(FileName);
+      std::filesystem::path AbsoluteFilePath(FileName.c_str());
+
+      auto RelativeFilePath =
+          std::filesystem::relative(AbsoluteFilePath, ProjectRoot.value());
+
+      FileName = RelativeFilePath.generic_string();
+    }
+
+    return vara::CodeLocation{FileName.c_str(), Lineno, Colno};
+  }
+
+  return std::nullopt;
+}
 
 class CandidateBase {
 public:
   CandidateBase(std::string File, uint32_t Lineno, uint32_t Colno)
-      : Location{std::move(File), Lineno, Colno} {}
+      : DefinitionLocation{std::move(File), Lineno, Colno} {}
+
+  CandidateBase(CodeLocation DefinitionLocation,
+                std::vector<CodeLocation> Usages)
+      : DefinitionLocation{std::move(DefinitionLocation)},
+        UsageLocations(std::move(Usages)) {}
 
   CandidateBase() = default;
 
@@ -34,16 +76,16 @@ public:
 
   void mapToYaml(llvm::yaml::IO &io) {
     // Map common properties
-    io.mapRequired("Location", this->Location);
+    io.mapRequired("Location", this->DefinitionLocation);
     this->mapAdditionalProperties(io);
+    io.mapRequired("UseLocations", this->UsageLocations);
   }
 
-  CodeLocation Location;
+  CodeLocation DefinitionLocation;
+  std::vector<CodeLocation> UsageLocations;
 
 protected:
   virtual void mapAdditionalProperties(llvm::yaml::IO &io){};
-
-private:
 };
 
 class TemplateLiteral : public CandidateBase {
@@ -53,6 +95,7 @@ public:
       : CandidateBase(std::move(File), Lineno, Colno),
         TClassName(std::move(TClassName)), TArgName(std::move(TArgName)) {}
 
+  TemplateLiteral() = default;
   TemplateLiteral(const TemplateLiteral &) = default;
   ~TemplateLiteral() override = default;
   TemplateLiteral &operator=(const TemplateLiteral &) = default;
@@ -77,6 +120,7 @@ public:
         QualType(std::move(QualType)), QualifiedName(std::move(QualifiedName)) {
   }
 
+  HiddenVariable() = default;
   HiddenVariable(const HiddenVariable &) = default;
   ~HiddenVariable() override = default;
   HiddenVariable &operator=(const HiddenVariable &) = default;
@@ -102,6 +146,7 @@ public:
                        std::move(QualifiedName)),
         ClassName(std::move(ClassName)) {}
 
+  HiddenField() = default;
   HiddenField(const HiddenField &Other) = default;
   ~HiddenField() override = default;
   HiddenField &operator=(const HiddenField &Other) = default;
