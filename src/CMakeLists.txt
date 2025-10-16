@@ -1,6 +1,6 @@
 set(LLVM_LINK_COMPONENTS FrontEndOpenMP Support)
 
-add_vara_executable(
+custom_add_executable(
   hidden-variability-finder HiddenVariabilityFinderDriver.cpp
   MatcherCallbacks.cpp
 )
