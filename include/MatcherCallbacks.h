@@ -30,9 +30,8 @@ using DynMatcherInterface = clang::ast_matchers::internal::DynMatcherInterface;
 class HCMatcherBase : public MatchFinder::MatchCallback {
 public:
   HCMatcherBase(
-      ExecutionContext &Context,
       const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
-      : Context(Context), ProjectRoot(ProjectRoot) {}
+      : ProjectRoot(ProjectRoot) {}
 
   void run(const MatchFinder::MatchResult &Result) override {
     // All matchers should follow the same overall logic:
@@ -52,8 +51,14 @@ public:
     }
   }
 
-  virtual void mapResults(vara::ResultMapTy &Results) = 0;
-  ExecutionContext &Context;
+  void mapResults(vara::ResultMapTy2 &Results, CandidateType Type) {
+    Results[Type];
+
+    for (auto &[_, HiddenVar] : Matches) {
+      Results[Type].push_back(std::move(HiddenVar));
+    }
+  }
+
   std::optional<std::filesystem::path> ProjectRoot;
 
   virtual void registerMatcher(MatchFinder &Finder) = 0;
@@ -75,11 +80,8 @@ private:
 class ConstVarMatcher : public HCMatcherBase {
 public:
   ConstVarMatcher(
-      ExecutionContext &Context,
       const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
-      : HCMatcherBase(Context, ProjectRoot) {}
-
-  void mapResults(vara::ResultMapTy &Results) override;
+      : HCMatcherBase(ProjectRoot) {}
 
   void registerMatcher(MatchFinder &Finder) override {
     auto GlobalMatcher = GlobalConstVarMatcher.bind(

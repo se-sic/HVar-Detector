@@ -7,7 +7,6 @@
 
 using namespace clang::tooling;
 using namespace clang::ast_matchers;
-using namespace llvm;
 using llvm::yaml::Output;
 
 // Apply a custom category to all command-line options so that they are the
@@ -29,16 +28,17 @@ static llvm::cl::opt<std::string> RootDir(
 // CommonOptionsParser declares HelpMessage with a description of the common
 // command-line options related to the compilation database and input files.
 // It's nice to have this help message in all tools.
-static cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
+static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 
 // A help message for this specific tool can be added afterwards.
-static cl::extrahelp MoreHelp("\nMore help text...\n");
+static llvm::cl::extrahelp MoreHelp("\nMore help text...\n");
 
 int main(int argc, const char **argv) {
   llvm::outs() << "You are using hidden-variability-finder\n";
   llvm::sys::PrintStackTraceOnErrorSignal(argv[0]);
 
   vara::ResultMapTy Results;
+  vara::ResultMapTy2 Results2;
 
   auto Executor =
       clang::tooling::createExecutorFromCommandLineArgs(argc, argv, HVFOptions);
@@ -88,6 +88,9 @@ int main(int argc, const char **argv) {
                         vara::toString(vara::CandidateType::TemplateLiteral)),
                     &TemplateLiteralMatcherCB);
 
+  ConstVarMatcher CVarMatcher(RootDirectory);
+  CVarMatcher.registerMatcher(Finder);
+
   std::filesystem::path OutputPath = std::string(OutFile);
 
   if (OutputPath.filename().empty()) {
@@ -106,8 +109,10 @@ int main(int argc, const char **argv) {
   ConstFieldMatcherCallback.mapResults(Results);
   TemplateLiteralMatcherCB.mapResults(Results);
 
+  CVarMatcher.mapResults(Results2, CandidateType::GlobalConstVar);
+
   std::error_code EC;
-  raw_fd_ostream Ostream(OutputPath.native(), EC);
+  llvm::raw_fd_ostream Ostream(OutputPath.native(), EC);
 
   if (EC) {
     llvm::errs() << "Error while opening report file!\n";
@@ -117,4 +122,16 @@ int main(int argc, const char **argv) {
   llvm::yaml::Output YamlOutput(Ostream);
 
   YamlOutput << Results;
+
+  OutputPath.replace_extension(".yml2");
+
+  llvm::raw_fd_ostream Ostream2(OutputPath.native(), EC);
+
+  if (EC) {
+    llvm::errs() << "Error while opening report file!\n";
+    return 1;
+  }
+
+  llvm::yaml::Output YamlOutput2(Ostream2);
+  YamlOutput2 << Results2;
 }

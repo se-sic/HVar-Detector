@@ -10,10 +10,6 @@
 
 namespace vara {
 
-void ConstVarMatcher::mapResults(vara::ResultMapTy &Results) {
-  // TODO: Implement me
-}
-
 std::unique_ptr<CandidateBase>
 ConstVarMatcher::extractCandidate(const MatchFinder::MatchResult &Result) {
   if (const auto *D = Result.Nodes.getNodeAs<clang::VarDecl>(

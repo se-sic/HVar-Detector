@@ -80,6 +80,13 @@ struct llvm::yaml::MappingTraits<std::shared_ptr<vara::CandidateBase>> {
   }
 };
 
+template <>
+struct llvm::yaml::MappingTraits<std::unique_ptr<vara::CandidateBase>> {
+  static void mapping(IO &io, std::unique_ptr<vara::CandidateBase> &baseInfo) {
+    baseInfo->mapToYaml(io);
+  }
+};
+
 template <> struct llvm::yaml::ScalarEnumerationTraits<vara::CandidateType> {
   static void enumeration(IO &io, vara::CandidateType &value) {
     io.enumCase(value, "LocalConstVar", vara::CandidateType::LocalConstVar);
@@ -109,5 +116,25 @@ template <> struct llvm::yaml::CustomMappingTraits<vara::ResultMapTy> {
   }
 };
 
+template <> struct llvm::yaml::CustomMappingTraits<vara::ResultMapTy2> {
+  static void inputOne(IO &io, StringRef key, vara::ResultMapTy2 &elem) {
+    auto kind = vara::fromString(key.str());
+
+    if (kind == vara::CandidateType::Unknown) {
+      io.setError("Invalid value for configurability kind");
+      return;
+    }
+
+    io.mapRequired(key.str().c_str(), elem[kind]);
+  }
+
+  static void output(IO &io, vara::ResultMapTy2 &elem) {
+    for (auto &[key, value] : elem) {
+      io.mapRequired(vara::toString(key).c_str(), value);
+    }
+  }
+};
+
 LLVM_YAML_IS_SEQUENCE_VECTOR(std::shared_ptr<vara::CandidateBase>)
+LLVM_YAML_IS_SEQUENCE_VECTOR(std::unique_ptr<vara::CandidateBase>)
 #endif // HIDDEN_CONFIGURABILITY_MATCHERS_H
