@@ -1,12 +1,13 @@
-#include <set>
-#include <utility>
-
 //
 // Created by abeltluk on 9/6/24.
 //
 
-#ifndef LLVM_HIDDENVARIABILITYCANDIDATES_H
-#define LLVM_HIDDENVARIABILITYCANDIDATES_H
+#ifndef HIDDEN_CONFIGURABILITY_CANIDATES_H
+#define HIDDEN_CONFIGURABILITY_CANIDATES_H
+#include "llvm/Support/YAMLTraits.h"
+
+#include <utility>
+
 namespace vara {
 enum class CandidateType : std::uint8_t {
   GlobalConstVar,
@@ -25,6 +26,10 @@ struct CodeLocation {
     return std::tie(lhs.File, lhs.Lineno, lhs.Colno) <
            std::tie(rhs.File, rhs.Lineno, rhs.Colno);
   }
+};
+
+struct FunctionLocation {
+  std::string FunctionName;
 };
 
 static std::optional<vara::CodeLocation>
@@ -83,6 +88,7 @@ public:
 
   CodeLocation DefinitionLocation;
   std::vector<CodeLocation> UsageLocations;
+  std::vector<FunctionLocation> UsageFunctions;
 
 protected:
   virtual void mapAdditionalProperties(llvm::yaml::IO &io){};
@@ -178,6 +184,7 @@ inline std::string toString(CandidateType Type) noexcept {
   case CandidateType::Unknown:
     return "Unknown";
   }
+  return "Unknown";
 }
 
 inline CandidateType fromString(std::string s) {
@@ -206,4 +213,6 @@ template <> struct llvm::yaml::MappingTraits<vara::CodeLocation> {
     io.mapRequired("Colno", codeLocation.Colno);
   }
 };
-#endif // LLVM_HIDDENVARIABILITYCANDIDATES_H
+
+LLVM_YAML_IS_SEQUENCE_VECTOR(vara::CodeLocation)
+#endif // HIDDEN_CONFIGURABILITY_CANIDATES_H

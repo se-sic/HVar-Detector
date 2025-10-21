@@ -63,18 +63,14 @@ int main(int argc, const char **argv) {
   // TODO: Refactor this with some proper registry such that it can easily be
   // extended with new patterns
   VarDeclMatcherCallback<vara::CandidateType::GlobalConstVar>
-      GlobalConstVarCallback(*Executor->get()->getExecutionContext(),
-                             RootDirectory);
+      GlobalConstVarCallback(RootDirectory);
 
   VarDeclMatcherCallback<vara::CandidateType::LocalConstVar>
-      LocalConstVarCallback(*Executor->get()->getExecutionContext(),
-                            RootDirectory);
+      LocalConstVarCallback(RootDirectory);
 
-  FieldDeclMatcherCallback ConstFieldMatcherCallback(
-      *Executor->get()->getExecutionContext(), RootDirectory);
+  FieldDeclMatcherCallback ConstFieldMatcherCallback(RootDirectory);
 
-  TemplateLiteralMatcherCallback TemplateLiteralMatcherCB(
-      *Executor->get()->getExecutionContext(), RootDirectory);
+  TemplateLiteralMatcherCallback TemplateLiteralMatcherCB(RootDirectory);
 
   Finder.addMatcher(vara::GlobalConstVarMatcher.bind(
                         vara::toString(vara::CandidateType::GlobalConstVar)),

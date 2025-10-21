@@ -2,11 +2,10 @@
 // Created by abeltluk on 7/16/24.
 //
 
-#ifndef HIDDENCONFIGURABILITYMATCHERS_H
-#define HIDDENCONFIGURABILITYMATCHERS_H
+#ifndef HIDDEN_CONFIGURABILITY_MATCHERS_H
+#define HIDDEN_CONFIGURABILITY_MATCHERS_H
 
 #include "clang/Frontend/FrontendActions.h"
-#include "clang/Tooling/Tooling.h"
 
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/Tooling/Refactoring/AtomicChange.h"
@@ -111,5 +110,4 @@ template <> struct llvm::yaml::CustomMappingTraits<vara::ResultMapTy> {
 };
 
 LLVM_YAML_IS_SEQUENCE_VECTOR(std::shared_ptr<vara::CandidateBase>)
-LLVM_YAML_IS_SEQUENCE_VECTOR(vara::CodeLocation)
-#endif // HIDDENCONFIGURABILITYMATCHERS_H
+#endif // HIDDEN_CONFIGURABILITY_MATCHERS_H
