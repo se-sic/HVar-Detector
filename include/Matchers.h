@@ -5,6 +5,7 @@
 #ifndef HIDDEN_CONFIGURABILITY_MATCHERS_H
 #define HIDDEN_CONFIGURABILITY_MATCHERS_H
 
+#include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Frontend/FrontendActions.h"
 
 #include "clang/ASTMatchers/ASTMatchFinder.h"
@@ -14,7 +15,7 @@
 #include "Candidates.h"
 
 namespace vara {
-
+namespace ast_matchers {
 using namespace clang::ast_matchers;
 
 const auto AnyLiteralType =
@@ -71,8 +72,8 @@ const auto
                  allOf(hasAnyTemplateArgument(isIntegral()),
                        unless(isExpansionInSystemHeader()))));
 
+} // namespace ast_matchers
 } // namespace vara
-
 template <>
 struct llvm::yaml::MappingTraits<std::shared_ptr<vara::CandidateBase>> {
   static void mapping(IO &io, std::shared_ptr<vara::CandidateBase> &baseInfo) {

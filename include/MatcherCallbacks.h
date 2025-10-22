@@ -86,8 +86,8 @@ public:
       : HCMatcherBase(ProjectRoot) {}
 
   void registerMatcher(MatchFinder &Finder) override {
-    auto GlobalMatcher =
-        GlobalConstVarMatcher.bind(vara::toString(getCandidateType()));
+    auto GlobalMatcher = ast_matchers::GlobalConstVarMatcher.bind(
+        vara::toString(getCandidateType()));
 
     Finder.addMatcher(GlobalMatcher, this);
   };

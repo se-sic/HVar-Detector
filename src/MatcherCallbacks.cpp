@@ -75,8 +75,8 @@ void ConstVarMatcherBase::VariableUsageMatcher::run(
 }
 
 void ConstFieldMatcher::registerMatcher(MatchFinder &Finder) {
-  auto FieldMatcher =
-      vara::ConstFieldASTMatcher.bind(vara::toString(this->getCandidateType()));
+  auto FieldMatcher = ast_matchers::ConstFieldASTMatcher.bind(
+      vara::toString(this->getCandidateType()));
 
   Finder.addMatcher(FieldMatcher, this);
 }
@@ -162,7 +162,7 @@ void ConstFieldMatcher::MemberUsageMatcher::run(
 }
 
 void TemplateLiteralMatcher::registerMatcher(MatchFinder &Finder) {
-  auto TemplateMatcher = vara::TemplateLiteralMatcher.bind(
+  auto TemplateMatcher = ast_matchers::TemplateLiteralMatcher.bind(
       vara::toString(this->getCandidateType()));
 
   Finder.addMatcher(TemplateMatcher, this);

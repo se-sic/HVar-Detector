@@ -72,19 +72,19 @@ int main(int argc, const char **argv) {
 
   TemplateLiteralMatcherCallback TemplateLiteralMatcherCB(RootDirectory);
 
-  Finder.addMatcher(vara::GlobalConstVarMatcher.bind(
+  Finder.addMatcher(ast_matchers::GlobalConstVarMatcher.bind(
                         vara::toString(vara::CandidateType::GlobalConstVar)),
                     &GlobalConstVarCallback);
 
-  Finder.addMatcher(vara::LocalConstVarMatcher.bind(
-                        vara::toString(vara::CandidateType::LocalConstVar)),
+  Finder.addMatcher(ast_matchers::LocalConstVarMatcher.bind(
+                        toString(vara::CandidateType::LocalConstVar)),
                     &LocalConstVarCallback);
 
-  Finder.addMatcher(vara::ConstFieldASTMatcher.bind(
+  Finder.addMatcher(ast_matchers::ConstFieldASTMatcher.bind(
                         vara::toString(vara::CandidateType::ConstField)),
                     &ConstFieldMatcherCallback);
 
-  Finder.addMatcher(vara::TemplateLiteralMatcher.bind(
+  Finder.addMatcher(ast_matchers::TemplateLiteralMatcher.bind(
                         vara::toString(vara::CandidateType::TemplateLiteral)),
                     &TemplateLiteralMatcherCB);
 
@@ -96,6 +96,9 @@ int main(int argc, const char **argv) {
 
   ConstFieldMatcher CFMatcher(RootDirectory);
   CFMatcher.registerMatcher(Finder);
+
+  TemplateLiteralMatcher TLMatcher(RootDirectory);
+  TLMatcher.registerMatcher(Finder);
 
   std::filesystem::path OutputPath = std::string(OutFile);
 
@@ -118,6 +121,7 @@ int main(int argc, const char **argv) {
   GCVarMatcher.mapResults(Results2, GCVarMatcher.getCandidateType());
   LCVarMatcher.mapResults(Results2, LCVarMatcher.getCandidateType());
   CFMatcher.mapResults(Results2, CFMatcher.getCandidateType());
+  TLMatcher.mapResults(Results2, TLMatcher.getCandidateType());
 
   std::error_code EC;
   llvm::raw_fd_ostream Ostream(OutputPath.native(), EC);
