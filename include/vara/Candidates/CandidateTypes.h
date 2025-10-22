@@ -4,6 +4,8 @@
 
 #ifndef HC_CANDIDATE_TYPES_H
 #define HC_CANDIDATE_TYPES_H
+#include "llvm/Support/YAMLTraits.h"
+
 namespace vara {
 enum class CandidateType : std::uint8_t {
   GlobalConstVar,

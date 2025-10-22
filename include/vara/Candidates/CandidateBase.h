@@ -7,6 +7,8 @@
 #include "vara/Candidates/CandidateTypes.h"
 #include "llvm/Support/YAMLTraits.h"
 
+#include <filesystem>
+#include <optional>
 #include <utility>
 
 namespace vara {
