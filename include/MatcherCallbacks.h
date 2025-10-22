@@ -162,6 +162,26 @@ private:
   };
 };
 
+class TemplateLiteralMatcher : public HCMatcherBase {
+public:
+  TemplateLiteralMatcher(
+      const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
+      : HCMatcherBase(std::move(ProjectRoot)) {}
+
+  void registerMatcher(MatchFinder &Finder) override;
+  CandidateType getCandidateType() const override {
+    return CandidateType::TemplateLiteral;
+  };
+
+protected:
+  std::unique_ptr<CandidateBase>
+  extractCandidate(const MatchFinder::MatchResult &Result) override;
+  std::vector<CodeLocation>
+  extractUsageLocations(const MatchFinder::MatchResult &Result) override;
+  std::vector<FunctionLocation>
+  extractFunctionLocations(const MatchFinder::MatchResult &Result) override;
+};
+
 class HiddenVariabilityMatcherCallback : public MatchFinder::MatchCallback {
 public:
   HiddenVariabilityMatcherCallback(
