@@ -8,10 +8,6 @@
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/Frontend/FrontendActions.h"
 
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/Tooling/Refactoring/AtomicChange.h"
-#include "llvm/Support/Signals.h"
-
 #include "vara/Candidates/CandidateBase.h"
 
 namespace vara {

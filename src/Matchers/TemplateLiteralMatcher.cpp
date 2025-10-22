@@ -3,6 +3,7 @@
 //
 #include "vara/Matchers/TemplateLiteralMatcher.h"
 #include "vara/Candidates/TemplateLiteral.h"
+#include "vara/Matchers/ASTMatchers.h"
 
 namespace vara {
 

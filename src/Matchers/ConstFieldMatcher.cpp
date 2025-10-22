@@ -4,6 +4,7 @@
 
 #include "vara/Matchers/ConstFieldMatcher.h"
 #include "vara/Candidates/HiddenField.h"
+#include "vara/Matchers/ASTMatchers.h"
 
 namespace vara {
 

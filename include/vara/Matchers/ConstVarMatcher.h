@@ -4,11 +4,13 @@
 
 #ifndef HC_CONST_VAR_MATCHER_H
 #define HC_CONST_VAR_MATCHER_H
+#include "vara/Matchers/ASTMatchers.h"
 #include "vara/Matchers/MatcherBase.h"
+
 namespace vara {
 class ConstVarMatcherBase : public HCMatcherBase {
 public:
-  ConstVarMatcherBase(
+  explicit ConstVarMatcherBase(
       const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
       : HCMatcherBase(ProjectRoot) {}
 
@@ -31,7 +33,7 @@ protected:
 private:
   class VariableUsageMatcher : public MatchCallback {
   public:
-    VariableUsageMatcher(
+    explicit VariableUsageMatcher(
         std::optional<std::filesystem::path> ProjectRoot = std::nullopt)
         : ProjectRoot(std::move(ProjectRoot)) {}
 
@@ -47,7 +49,7 @@ private:
 template <CandidateType CType>
 class ConstVarMatcher : public ConstVarMatcherBase {
 public:
-  ConstVarMatcher(
+  explicit ConstVarMatcher(
       std::optional<std::filesystem::path> ProjectRoot = std::nullopt)
       : ConstVarMatcherBase(std::move(ProjectRoot)) {}
 

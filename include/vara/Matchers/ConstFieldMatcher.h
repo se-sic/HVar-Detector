@@ -10,7 +10,7 @@ namespace vara {
 
 class ConstFieldMatcher : public HCMatcherBase {
 public:
-  ConstFieldMatcher(
+  explicit ConstFieldMatcher(
       const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
       : HCMatcherBase(ProjectRoot) {}
 
@@ -30,7 +30,7 @@ protected:
 private:
   class MemberUsageMatcher : public MatchCallback {
   public:
-    MemberUsageMatcher(
+    explicit MemberUsageMatcher(
         std::optional<std::filesystem::path> ProjectRoot = std::nullopt)
         : ProjectRoot(std::move(ProjectRoot)) {}
 

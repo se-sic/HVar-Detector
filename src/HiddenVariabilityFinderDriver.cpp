@@ -1,10 +1,11 @@
 // Declares clang::SyntaxOnlyAction.
 
-#include "vara/Matchers/ASTMatchers.h"
 #include "vara/Matchers/ConstFieldMatcher.h"
 #include "vara/Matchers/ConstVarMatcher.h"
 #include "vara/Matchers/MatcherBase.h"
 #include "vara/Matchers/TemplateLiteralMatcher.h"
+
+#include "llvm/Support/Signals.h"
 
 #include <fstream>
 
@@ -84,8 +85,7 @@ int main(int argc, const char **argv) {
     OutputPath.replace_filename(OutFile.Default.getValue());
   }
 
-  auto Err = Executor->get()->execute(newFrontendActionFactory(&Finder));
-  if (Err) {
+  if (auto Err = Executor->get()->execute(newFrontendActionFactory(&Finder))) {
     llvm::errs() << llvm::toString(std::move(Err)) << "\n";
   }
 

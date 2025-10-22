@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "vara/Candidates/CandidateBase.h"
-#include "vara/Matchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include "clang/ASTMatchers/ASTMatchersInternal.h"
 
@@ -25,7 +24,7 @@ using DynMatcherInterface = clang::ast_matchers::internal::DynMatcherInterface;
 
 class HCMatcherBase : public MatchFinder::MatchCallback {
 public:
-  HCMatcherBase(
+  explicit HCMatcherBase(
       const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
       : ProjectRoot(ProjectRoot) {}
 

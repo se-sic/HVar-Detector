@@ -5,12 +5,13 @@
 #ifndef HC_TEMPLATE_LITERAL_MATCHER_H
 #define HC_TEMPLATE_LITERAL_MATCHER_H
 #include "vara/Matchers/MatcherBase.h"
+#include <memory>
 
 namespace vara {
 
 class TemplateLiteralMatcher : public HCMatcherBase {
 public:
-  TemplateLiteralMatcher(
+  explicit TemplateLiteralMatcher(
       const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
       : HCMatcherBase(std::move(ProjectRoot)) {}
 
