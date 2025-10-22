@@ -129,6 +129,10 @@ public:
 
 class ConstFieldMatcher : public HCMatcherBase {
 public:
+  ConstFieldMatcher(
+      const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
+      : HCMatcherBase(ProjectRoot) {}
+
   void registerMatcher(MatchFinder &Finder) override;
   CandidateType getCandidateType() const override {
     return CandidateType::ConstField;

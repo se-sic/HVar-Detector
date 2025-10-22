@@ -49,7 +49,7 @@ const auto LocalConstVarMatcher = // Match all variable declarations
                  // Ignore includes from system headers
                  unless(isExpansionInSystemHeader()))));
 
-const auto ConstFieldMatcher = // Match all variable declarations
+const auto ConstFieldASTMatcher = // Match all variable declarations
     traverse(clang::TK_IgnoreUnlessSpelledInSource,
              fieldDecl(allOf(
                  // That use a built-in type

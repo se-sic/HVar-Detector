@@ -76,7 +76,7 @@ void ConstVarMatcherBase::VariableUsageMatcher::run(
 
 void ConstFieldMatcher::registerMatcher(MatchFinder &Finder) {
   auto FieldMatcher =
-      vara::ConstFieldMatcher.bind(vara::toString(this->getCandidateType()));
+      vara::ConstFieldASTMatcher.bind(vara::toString(this->getCandidateType()));
 
   Finder.addMatcher(FieldMatcher, this);
 }

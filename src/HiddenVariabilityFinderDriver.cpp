@@ -80,7 +80,7 @@ int main(int argc, const char **argv) {
                         vara::toString(vara::CandidateType::LocalConstVar)),
                     &LocalConstVarCallback);
 
-  Finder.addMatcher(vara::ConstFieldMatcher.bind(
+  Finder.addMatcher(vara::ConstFieldASTMatcher.bind(
                         vara::toString(vara::CandidateType::ConstField)),
                     &ConstFieldMatcherCallback);
 
@@ -93,6 +93,9 @@ int main(int argc, const char **argv) {
 
   ConstVarMatcher<CandidateType::LocalConstVar> LCVarMatcher(RootDirectory);
   LCVarMatcher.registerMatcher(Finder);
+
+  ConstFieldMatcher CFMatcher(RootDirectory);
+  CFMatcher.registerMatcher(Finder);
 
   std::filesystem::path OutputPath = std::string(OutFile);
 
@@ -114,6 +117,7 @@ int main(int argc, const char **argv) {
 
   GCVarMatcher.mapResults(Results2, GCVarMatcher.getCandidateType());
   LCVarMatcher.mapResults(Results2, LCVarMatcher.getCandidateType());
+  CFMatcher.mapResults(Results2, CFMatcher.getCandidateType());
 
   std::error_code EC;
   llvm::raw_fd_ostream Ostream(OutputPath.native(), EC);
