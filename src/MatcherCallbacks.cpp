@@ -11,7 +11,7 @@
 namespace vara {
 
 std::unique_ptr<CandidateBase>
-ConstVarMatcher::extractCandidate(const MatchFinder::MatchResult &Result) {
+ConstVarMatcherBase::extractCandidate(const MatchFinder::MatchResult &Result) {
   if (const auto *D = Result.Nodes.getNodeAs<clang::VarDecl>(
           vara::toString(CandidateType::GlobalConstVar))) {
     assert(D);
@@ -32,8 +32,8 @@ ConstVarMatcher::extractCandidate(const MatchFinder::MatchResult &Result) {
   return nullptr;
 }
 
-std::vector<CodeLocation>
-ConstVarMatcher::extractUsageLocations(const MatchFinder::MatchResult &Result) {
+std::vector<CodeLocation> ConstVarMatcherBase::extractUsageLocations(
+    const MatchFinder::MatchResult &Result) {
   std::vector<CodeLocation> UsageLocations;
   if (const auto *D = Result.Nodes.getNodeAs<clang::VarDecl>(
           vara::toString(CandidateType::GlobalConstVar))) {
@@ -51,12 +51,12 @@ ConstVarMatcher::extractUsageLocations(const MatchFinder::MatchResult &Result) {
   return UsageLocations;
 }
 
-std::vector<FunctionLocation> ConstVarMatcher::extractFunctionLocations(
+std::vector<FunctionLocation> ConstVarMatcherBase::extractFunctionLocations(
     const MatchFinder::MatchResult &Result) {
   return {};
 }
 
-void ConstVarMatcher::VariableUsageMatcher::run(
+void ConstVarMatcherBase::VariableUsageMatcher::run(
     const MatchFinder::MatchResult &Result) {
   if (const auto *DRE = Result.Nodes.getNodeAs<clang::DeclRefExpr>("varRef")) {
     if (const auto *VD = llvm::dyn_cast<clang::VarDecl>(DRE->getDecl())) {

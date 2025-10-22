@@ -63,6 +63,8 @@ public:
 
   virtual void registerMatcher(MatchFinder &Finder) = 0;
 
+  virtual CandidateType getCandidateType() const = 0;
+
   using MatchMapTy = std::map<CodeLocation, std::unique_ptr<CandidateBase>>;
 
 protected:
@@ -77,15 +79,15 @@ private:
   MatchMapTy Matches;
 };
 
-class ConstVarMatcher : public HCMatcherBase {
+class ConstVarMatcherBase : public HCMatcherBase {
 public:
-  ConstVarMatcher(
+  ConstVarMatcherBase(
       const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
       : HCMatcherBase(ProjectRoot) {}
 
   void registerMatcher(MatchFinder &Finder) override {
-    auto GlobalMatcher = GlobalConstVarMatcher.bind(
-        vara::toString(CandidateType::GlobalConstVar));
+    auto GlobalMatcher =
+        GlobalConstVarMatcher.bind(vara::toString(getCandidateType()));
 
     Finder.addMatcher(GlobalMatcher, this);
   };
@@ -95,6 +97,7 @@ protected:
   extractCandidate(const MatchFinder::MatchResult &Result) override;
   std::vector<CodeLocation>
   extractUsageLocations(const MatchFinder::MatchResult &Result) override;
+
   std::vector<FunctionLocation>
   extractFunctionLocations(const MatchFinder::MatchResult &Result) override;
 
@@ -112,6 +115,30 @@ private:
   private:
     std::optional<std::filesystem::path> ProjectRoot;
   };
+};
+
+template <CandidateType CType>
+class ConstVarMatcher : public ConstVarMatcherBase {
+public:
+  ConstVarMatcher(
+      std::optional<std::filesystem::path> ProjectRoot = std::nullopt)
+      : ConstVarMatcherBase(std::move(ProjectRoot)) {}
+
+  virtual CandidateType getCandidateType() const override { return CType; }
+};
+
+class ConstFieldMatcher : public HCMatcherBase {
+public:
+  void registerMatcher(MatchFinder &Finder) override;
+  CandidateType getCandidateType() const override;
+
+protected:
+  std::unique_ptr<CandidateBase>
+  extractCandidate(const MatchFinder::MatchResult &Result) override;
+  std::vector<CodeLocation>
+  extractUsageLocations(const MatchFinder::MatchResult &Result) override;
+  std::vector<FunctionLocation>
+  extractFunctionLocations(const MatchFinder::MatchResult &Result) override;
 };
 
 class HiddenVariabilityMatcherCallback : public MatchFinder::MatchCallback {

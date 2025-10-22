@@ -88,8 +88,11 @@ int main(int argc, const char **argv) {
                         vara::toString(vara::CandidateType::TemplateLiteral)),
                     &TemplateLiteralMatcherCB);
 
-  ConstVarMatcher CVarMatcher(RootDirectory);
-  CVarMatcher.registerMatcher(Finder);
+  ConstVarMatcher<CandidateType::GlobalConstVar> GCVarMatcher(RootDirectory);
+  GCVarMatcher.registerMatcher(Finder);
+
+  ConstVarMatcher<CandidateType::LocalConstVar> LCVarMatcher(RootDirectory);
+  LCVarMatcher.registerMatcher(Finder);
 
   std::filesystem::path OutputPath = std::string(OutFile);
 
@@ -109,7 +112,8 @@ int main(int argc, const char **argv) {
   ConstFieldMatcherCallback.mapResults(Results);
   TemplateLiteralMatcherCB.mapResults(Results);
 
-  CVarMatcher.mapResults(Results2, CandidateType::GlobalConstVar);
+  GCVarMatcher.mapResults(Results2, GCVarMatcher.getCandidateType());
+  LCVarMatcher.mapResults(Results2, LCVarMatcher.getCandidateType());
 
   std::error_code EC;
   llvm::raw_fd_ostream Ostream(OutputPath.native(), EC);
