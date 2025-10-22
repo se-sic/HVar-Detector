@@ -38,7 +38,6 @@ int main(int argc, const char **argv) {
   llvm::sys::PrintStackTraceOnErrorSignal(argv[0]);
 
   vara::ResultMapTy Results;
-  vara::ResultMapTy2 Results2;
 
   auto Executor =
       clang::tooling::createExecutorFromCommandLineArgs(argc, argv, HVFOptions);
@@ -62,31 +61,6 @@ int main(int argc, const char **argv) {
   using namespace vara;
   // TODO: Refactor this with some proper registry such that it can easily be
   // extended with new patterns
-  VarDeclMatcherCallback<vara::CandidateType::GlobalConstVar>
-      GlobalConstVarCallback(RootDirectory);
-
-  VarDeclMatcherCallback<vara::CandidateType::LocalConstVar>
-      LocalConstVarCallback(RootDirectory);
-
-  FieldDeclMatcherCallback ConstFieldMatcherCallback(RootDirectory);
-
-  TemplateLiteralMatcherCallback TemplateLiteralMatcherCB(RootDirectory);
-
-  Finder.addMatcher(ast_matchers::GlobalConstVarMatcher.bind(
-                        vara::toString(vara::CandidateType::GlobalConstVar)),
-                    &GlobalConstVarCallback);
-
-  Finder.addMatcher(ast_matchers::LocalConstVarMatcher.bind(
-                        toString(vara::CandidateType::LocalConstVar)),
-                    &LocalConstVarCallback);
-
-  Finder.addMatcher(ast_matchers::ConstFieldASTMatcher.bind(
-                        vara::toString(vara::CandidateType::ConstField)),
-                    &ConstFieldMatcherCallback);
-
-  Finder.addMatcher(ast_matchers::TemplateLiteralMatcher.bind(
-                        vara::toString(vara::CandidateType::TemplateLiteral)),
-                    &TemplateLiteralMatcherCB);
 
   ConstVarMatcher<CandidateType::GlobalConstVar> GCVarMatcher(RootDirectory);
   GCVarMatcher.registerMatcher(Finder);
@@ -112,16 +86,10 @@ int main(int argc, const char **argv) {
     llvm::errs() << llvm::toString(std::move(Err)) << "\n";
   }
 
-  // TODO
-  LocalConstVarCallback.mapResults(Results);
-  GlobalConstVarCallback.mapResults(Results);
-  ConstFieldMatcherCallback.mapResults(Results);
-  TemplateLiteralMatcherCB.mapResults(Results);
-
-  GCVarMatcher.mapResults(Results2, GCVarMatcher.getCandidateType());
-  LCVarMatcher.mapResults(Results2, LCVarMatcher.getCandidateType());
-  CFMatcher.mapResults(Results2, CFMatcher.getCandidateType());
-  TLMatcher.mapResults(Results2, TLMatcher.getCandidateType());
+  GCVarMatcher.mapResults(Results, GCVarMatcher.getCandidateType());
+  LCVarMatcher.mapResults(Results, LCVarMatcher.getCandidateType());
+  CFMatcher.mapResults(Results, CFMatcher.getCandidateType());
+  TLMatcher.mapResults(Results, TLMatcher.getCandidateType());
 
   std::error_code EC;
   llvm::raw_fd_ostream Ostream(OutputPath.native(), EC);
@@ -131,19 +99,6 @@ int main(int argc, const char **argv) {
     return 1;
   }
 
-  llvm::yaml::Output YamlOutput(Ostream);
-
-  YamlOutput << Results;
-
-  OutputPath.replace_extension(".yml2");
-
-  llvm::raw_fd_ostream Ostream2(OutputPath.native(), EC);
-
-  if (EC) {
-    llvm::errs() << "Error while opening report file!\n";
-    return 1;
-  }
-
-  llvm::yaml::Output YamlOutput2(Ostream2);
-  YamlOutput2 << Results2;
+  llvm::yaml::Output YamlOutput2(Ostream);
+  YamlOutput2 << Results;
 }

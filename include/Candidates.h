@@ -169,11 +169,7 @@ private:
 };
 
 using ResultMapTy = std::map<vara::CandidateType,
-                             std::vector<std::shared_ptr<vara::CandidateBase>>>;
-
-using ResultMapTy2 =
-    std::map<vara::CandidateType,
-             std::vector<std::unique_ptr<vara::CandidateBase>>>;
+                             std::vector<std::unique_ptr<vara::CandidateBase>>>;
 
 inline std::string toString(CandidateType Type) noexcept {
   switch (Type) {
