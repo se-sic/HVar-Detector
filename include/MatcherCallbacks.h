@@ -130,7 +130,9 @@ public:
 class ConstFieldMatcher : public HCMatcherBase {
 public:
   void registerMatcher(MatchFinder &Finder) override;
-  CandidateType getCandidateType() const override;
+  CandidateType getCandidateType() const override {
+    return CandidateType::ConstField;
+  };
 
 protected:
   std::unique_ptr<CandidateBase>
@@ -139,6 +141,21 @@ protected:
   extractUsageLocations(const MatchFinder::MatchResult &Result) override;
   std::vector<FunctionLocation>
   extractFunctionLocations(const MatchFinder::MatchResult &Result) override;
+
+private:
+  class MemberUsageMatcher : public MatchCallback {
+  public:
+    MemberUsageMatcher(
+        std::optional<std::filesystem::path> ProjectRoot = std::nullopt)
+        : ProjectRoot(std::move(ProjectRoot)) {}
+
+    virtual void run(const MatchFinder::MatchResult &Result) override;
+
+    std::vector<CodeLocation> UsageLocations;
+
+  private:
+    std::optional<std::filesystem::path> ProjectRoot = std::nullopt;
+  };
 };
 
 class HiddenVariabilityMatcherCallback : public MatchFinder::MatchCallback {
