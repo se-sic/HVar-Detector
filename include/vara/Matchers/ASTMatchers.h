@@ -12,7 +12,7 @@
 #include "clang/Tooling/Refactoring/AtomicChange.h"
 #include "llvm/Support/Signals.h"
 
-#include "Candidates.h"
+#include "vara/Candidates/CandidateBase.h"
 
 namespace vara {
 namespace ast_matchers {
@@ -74,29 +74,6 @@ const auto
 
 } // namespace ast_matchers
 } // namespace vara
-template <>
-struct llvm::yaml::MappingTraits<std::shared_ptr<vara::CandidateBase>> {
-  static void mapping(IO &io, std::shared_ptr<vara::CandidateBase> &baseInfo) {
-    baseInfo->mapToYaml(io);
-  }
-};
-
-template <>
-struct llvm::yaml::MappingTraits<std::unique_ptr<vara::CandidateBase>> {
-  static void mapping(IO &io, std::unique_ptr<vara::CandidateBase> &baseInfo) {
-    baseInfo->mapToYaml(io);
-  }
-};
-
-template <> struct llvm::yaml::ScalarEnumerationTraits<vara::CandidateType> {
-  static void enumeration(IO &io, vara::CandidateType &value) {
-    io.enumCase(value, "LocalConstVar", vara::CandidateType::LocalConstVar);
-    io.enumCase(value, "GlobalConstVar", vara::CandidateType::GlobalConstVar);
-    io.enumCase(value, "ConstField", vara::CandidateType::ConstField);
-    io.enumCase(value, "TemplateLiteral", vara::CandidateType::TemplateLiteral);
-    io.enumCase(value, "Unknown", vara::CandidateType::Unknown);
-  }
-};
 
 template <> struct llvm::yaml::CustomMappingTraits<vara::ResultMapTy> {
   static void inputOne(IO &io, StringRef key, vara::ResultMapTy &elem) {
@@ -117,5 +94,4 @@ template <> struct llvm::yaml::CustomMappingTraits<vara::ResultMapTy> {
   }
 };
 
-LLVM_YAML_IS_SEQUENCE_VECTOR(std::unique_ptr<vara::CandidateBase>)
 #endif // HIDDEN_CONFIGURABILITY_MATCHERS_H

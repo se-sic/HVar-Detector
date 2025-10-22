@@ -1,7 +1,10 @@
 // Declares clang::SyntaxOnlyAction.
 
-#include "MatcherCallbacks.h"
-#include "Matchers.h"
+#include "vara/Matchers/ASTMatchers.h"
+#include "vara/Matchers/ConstFieldMatcher.h"
+#include "vara/Matchers/ConstVarMatcher.h"
+#include "vara/Matchers/MatcherBase.h"
+#include "vara/Matchers/TemplateLiteralMatcher.h"
 
 #include <fstream>
 

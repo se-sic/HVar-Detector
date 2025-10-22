@@ -1,8 +1,11 @@
 set(LLVM_LINK_COMPONENTS FrontEndOpenMP Support)
 
 custom_add_executable(
-  hidden-variability-finder HiddenVariabilityFinderDriver.cpp
-  MatcherCallbacks.cpp
+  hidden-variability-finder
+  HiddenVariabilityFinderDriver.cpp
+  Matchers/ConstVarMatcher.cpp
+  Matchers/ConstFieldMatcher.cpp
+  Matchers/TemplateLiteralMatcher.cpp
 )
 
 target_link_libraries(
