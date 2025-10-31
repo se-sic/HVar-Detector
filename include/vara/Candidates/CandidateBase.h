@@ -103,6 +103,8 @@ inline std::string toString(CandidateType Type) noexcept {
     return "ConstField";
   case CandidateType::TemplateLiteral:
     return "TemplateLiteral";
+  case CandidateType::LiteralComp:
+    return "LiteralComp";
   case CandidateType::Unknown:
     return "Unknown";
   }
@@ -121,6 +123,9 @@ inline CandidateType fromString(std::string s) {
   }
   if (s == "TemplateLiteral") {
     return CandidateType::TemplateLiteral;
+  }
+  if (s == "LiteralComp") {
+    return CandidateType::LiteralComp;
   }
 
   return CandidateType::Unknown;
