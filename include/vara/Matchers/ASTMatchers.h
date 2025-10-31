@@ -16,7 +16,7 @@ using namespace clang::ast_matchers;
 
 const auto AnyLiteralType =
     anyOf(integerLiteral(), floatLiteral(), stringLiteral(), characterLiteral(),
-          compoundLiteralExpr(), cxxBoolLiteral());
+          compoundLiteralExpr(), cxxBoolLiteral(), userDefinedLiteral());
 
 const auto GlobalConstVarMatcher = // Match all variable declarations
     traverse(
@@ -67,6 +67,10 @@ const auto
         traverse(clang::TK_IgnoreUnlessSpelledInSource,
                  allOf(hasAnyTemplateArgument(isIntegral()),
                        unless(isExpansionInSystemHeader()))));
+
+const auto LiteralCompMatcher = // Match comparison expressions
+    binaryOperation(allOf(anyOf(hasLHS(AnyLiteralType), hasRHS(AnyLiteralType)),
+                          unless(isExpansionInSystemHeader())));
 
 } // namespace ast_matchers
 } // namespace vara

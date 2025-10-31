@@ -12,6 +12,7 @@ enum class CandidateType : std::uint8_t {
   LocalConstVar,
   ConstField,
   TemplateLiteral,
+  LiteralComp,
   Unknown
 };
 }
@@ -22,6 +23,7 @@ template <> struct llvm::yaml::ScalarEnumerationTraits<vara::CandidateType> {
     io.enumCase(value, "GlobalConstVar", vara::CandidateType::GlobalConstVar);
     io.enumCase(value, "ConstField", vara::CandidateType::ConstField);
     io.enumCase(value, "TemplateLiteral", vara::CandidateType::TemplateLiteral);
+    io.enumCase(value, "LiteralComp", vara::CandidateType::LiteralComp);
     io.enumCase(value, "Unknown", vara::CandidateType::Unknown);
   }
 };
