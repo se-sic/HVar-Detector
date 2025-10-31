@@ -65,7 +65,7 @@ public:
       : DefinitionLocation{std::move(File), Lineno, Colno} {}
 
   CandidateBase(CodeLocation DefinitionLocation,
-                std::vector<CodeLocation> Usages)
+                std::vector<CodeLocation> Usages = {})
       : DefinitionLocation{std::move(DefinitionLocation)},
         UsageLocations(std::move(Usages)) {}
 

@@ -14,18 +14,22 @@ public:
   LiteralComp(std::string File, uint32_t Lineno, uint32_t Colno,
               std::string ComparisonType)
       : CandidateBase(std::move(File), Lineno, Colno),
-        ComparisonType(std::move(ComparisonType)) {}
+        CmpOperator(std::move(ComparisonType)) {}
+
+  LiteralComp(CodeLocation DefinitionLocation, std::string ComparisonType)
+      : CandidateBase(std::move(DefinitionLocation)),
+        CmpOperator(std::move(ComparisonType)) {}
 
   LiteralComp() = default;
   LiteralComp(const LiteralComp &) = default;
   ~LiteralComp() override = default;
   LiteralComp &operator=(const LiteralComp &) = default;
 
-  std::string ComparisonType;
+  std::string CmpOperator;
 
 protected:
   void mapAdditionalProperties(llvm::yaml::IO &io) override {
-    io.mapRequired("ComparisonType", this->ComparisonType);
+    io.mapRequired("ComparisonType", this->CmpOperator);
   }
 };
 } // namespace vara
