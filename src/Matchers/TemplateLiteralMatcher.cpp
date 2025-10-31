@@ -8,7 +8,7 @@
 namespace vara {
 
 void TemplateLiteralMatcher::registerMatcher(MatchFinder &Finder) {
-  auto TemplateMatcher = ast_matchers::TemplateLiteralMatcher.bind(
+  auto TemplateMatcher = ast_matchers::TemplateLiteralASTMatcher.bind(
       vara::toString(this->getCandidateType()));
 
   Finder.addMatcher(TemplateMatcher, this);
