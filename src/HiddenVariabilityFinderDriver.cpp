@@ -2,6 +2,7 @@
 
 #include "vara/Matchers/ConstFieldMatcher.h"
 #include "vara/Matchers/ConstVarMatcher.h"
+#include "vara/Matchers/LiteralCompMatcher.h"
 #include "vara/Matchers/MatcherBase.h"
 #include "vara/Matchers/TemplateLiteralMatcher.h"
 
@@ -77,6 +78,9 @@ int main(int argc, const char **argv) {
 
   TemplateLiteralMatcher TLMatcher(RootDirectory);
   TLMatcher.registerMatcher(Finder);
+
+  LiteralCompMatcher LCMatcher(RootDirectory);
+  LCMatcher.registerMatcher(Finder);
 
   std::filesystem::path OutputPath = std::string(OutFile);
 
