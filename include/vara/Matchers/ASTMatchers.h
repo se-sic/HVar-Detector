@@ -11,6 +11,7 @@
 #include "vara/Candidates/CandidateBase.h"
 
 namespace vara {
+
 namespace ast_matchers {
 using namespace clang::ast_matchers;
 

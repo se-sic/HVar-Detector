@@ -9,7 +9,7 @@ namespace vara {
 std::unique_ptr<CandidateBase>
 ConstVarMatcherBase::extractCandidate(const MatchFinder::MatchResult &Result) {
   if (const auto *D = Result.Nodes.getNodeAs<clang::VarDecl>(
-          vara::toString(CandidateType::GlobalConstVar))) {
+          vara::toString(getCandidateType()))) {
     assert(D);
 
     auto BaseLoc = parseLocation(
@@ -32,7 +32,7 @@ std::vector<CodeLocation> ConstVarMatcherBase::extractUsageLocations(
     const MatchFinder::MatchResult &Result) {
   std::vector<CodeLocation> UsageLocations;
   if (const auto *D = Result.Nodes.getNodeAs<clang::VarDecl>(
-          vara::toString(CandidateType::GlobalConstVar))) {
+          vara::toString(getCandidateType()))) {
     auto RefMatcher = declRefExpr(to(varDecl(equalsNode(D)))).bind("varRef");
     auto RefMatcherCB =
         std::make_unique<VariableUsageMatcher>(this->ProjectRoot);
