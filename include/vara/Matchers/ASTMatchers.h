@@ -65,9 +65,9 @@ const auto
     TemplateLiteralASTMatcher = // Match Template instantiations using literals
     classTemplateSpecializationDecl( // It is not possible to directly match the
                                      // template parameter itself
-        traverse(clang::TK_IgnoreUnlessSpelledInSource,
-                 allOf(hasAnyTemplateArgument(isIntegral()),
-                       unless(isExpansionInSystemHeader()))));
+
+        hasAnyTemplateArgument(isIntegral()),
+        unless(isExpansionInSystemHeader()));
 
 const auto LiteralCompASTMatcher = // Match comparison expressions
     binaryOperation(allOf(anyOf(hasLHS(AnyLiteralType), hasRHS(AnyLiteralType)),
