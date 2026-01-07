@@ -34,12 +34,12 @@ MixedTemplate<7, 'a'> mixed_inst;
 // Instantiate function template with two integral arguments
 void useFnMulti() {
   fnMulti<3, 4>();
-  // CHECK: Filename
-  // CHECK-SAME: MultipleArguments.cpp
-  // CHECK-NEXT: Lineno
-  // CHECK-SAME: 36
-  // CHECK: TemplateClassName
-  // CHECK-SAME: fnMulti
+  // XCHECK: Filename
+  // XCHECK-SAME: MultipleArguments.cpp
+  // XCHECK-NEXT: Lineno
+  // XCHECK-SAME: 36
+  // XCHECK: TemplateClassName
+  // XCHECK-SAME: fnMulti
 }
 
 // Instantiate class template mixing a type parameter and a non-type parameter

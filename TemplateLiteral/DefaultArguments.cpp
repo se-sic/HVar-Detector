@@ -24,4 +24,5 @@ DefaultArgTemplate<5> explicitInst;
 // Default argument instantiation (uses the default N = 3)
 DefaultArgTemplate<> defaultInst;
 // Default arguments not matched, therefore check for end of file
+// CHECK-NOT: Location:
 // CHECK: ...
