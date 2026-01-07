@@ -65,7 +65,7 @@ const auto
         // in VarDecl?
         unless(isExpansionInSystemHeader()));
 
-const auto LiteralCompASTMatcher = // Match comparison expressions
+const auto LiteralBinOpASTMatcher = // Match comparison expressions
     binaryOperation(allOf(anyOf(hasLHS(AnyLiteralType), hasRHS(AnyLiteralType)),
                           unless(isExpansionInSystemHeader())));
 

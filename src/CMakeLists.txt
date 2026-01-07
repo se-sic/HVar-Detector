@@ -6,7 +6,7 @@ custom_add_executable(
   Matchers/ConstVarMatcher.cpp
   Matchers/ConstFieldMatcher.cpp
   Matchers/TemplateLiteralMatcher.cpp
-  Matchers/LiteralCompMatcher.cpp
+  Matchers/LiteralBinOpMatcher.cpp
 )
 
 target_link_libraries(

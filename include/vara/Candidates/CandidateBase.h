@@ -80,6 +80,7 @@ public:
     io.mapRequired("Location", this->DefinitionLocation);
     this->mapAdditionalProperties(io);
     io.mapRequired("UseLocations", this->UsageLocations);
+    io.mapRequired("UseFunctions", this->UsageFunctions);
   }
 
   CodeLocation DefinitionLocation;
@@ -141,6 +142,12 @@ template <> struct llvm::yaml::MappingTraits<vara::CodeLocation> {
   }
 };
 
+template <> struct llvm::yaml::MappingTraits<vara::FunctionLocation> {
+  static void mapping(IO &io, vara::FunctionLocation &functionLocation) {
+    io.mapRequired("FunctionName", functionLocation.FunctionName);
+  }
+};
+
 template <>
 struct llvm::yaml::MappingTraits<std::unique_ptr<vara::CandidateBase>> {
   static void mapping(IO &io, std::unique_ptr<vara::CandidateBase> &baseInfo) {
@@ -150,4 +157,5 @@ struct llvm::yaml::MappingTraits<std::unique_ptr<vara::CandidateBase>> {
 
 LLVM_YAML_IS_SEQUENCE_VECTOR(std::unique_ptr<vara::CandidateBase>)
 LLVM_YAML_IS_SEQUENCE_VECTOR(vara::CodeLocation)
+LLVM_YAML_IS_SEQUENCE_VECTOR(vara::FunctionLocation)
 #endif // HIDDEN_CONFIGURABILITY_CANIDATES_H

@@ -4,19 +4,19 @@
 #include <optional>
 
 #include "MatcherBase.h"
-#include "vara/Candidates/LiteralComp.h"
+#include "vara/Candidates/LiteralBinOp.h"
 #include "vara/Matchers/ASTMatchers.h"
 #include "clang/Basic/OperatorKinds.h"
 
 namespace vara {
-class LiteralCompMatcher : public HCMatcherBase {
+class LiteralBinOpMatcher : public HCMatcherBase {
 public:
-  explicit LiteralCompMatcher(
+  explicit LiteralBinOpMatcher(
       const std::optional<std::filesystem::path> &ProjectRoot = std::nullopt)
       : HCMatcherBase(ProjectRoot) {}
 
   void registerMatcher(MatchFinder &Finder) override {
-    auto LiteralCompMatcher = ast_matchers::LiteralCompASTMatcher.bind(
+    auto LiteralCompMatcher = ast_matchers::LiteralBinOpASTMatcher.bind(
         vara::toString(getCandidateType()));
 
     Finder.addMatcher(LiteralCompMatcher, this);
@@ -36,7 +36,7 @@ protected:
 
 private:
   template <typename OpT>
-  std::unique_ptr<LiteralComp>
+  std::unique_ptr<LiteralBinOp>
   handleOperator(const OpT *Op, const MatchFinder::MatchResult &Result) {
     auto BaseLoc = parseLocation(
         Op->getOperatorLoc(), Result.Context->getSourceManager(), ProjectRoot);
@@ -57,11 +57,11 @@ private:
       return nullptr;
     }
 
-    return std::make_unique<LiteralComp>(BaseLoc.value(), OpStr);
+    return std::make_unique<LiteralBinOp>(BaseLoc.value(), OpStr);
   }
 
   template <typename NodeT, typename... OtherTs>
-  std::unique_ptr<LiteralComp>
+  std::unique_ptr<LiteralBinOp>
   extractCandidateImpl(const MatchFinder::MatchResult &Result) {
     if (const auto *Node = Result.Nodes.getNodeAs<NodeT>(
             vara::toString(CandidateType::LiteralComp))) {

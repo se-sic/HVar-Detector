@@ -2,7 +2,7 @@
 
 #include "vara/Matchers/ConstFieldMatcher.h"
 #include "vara/Matchers/ConstVarMatcher.h"
-#include "vara/Matchers/LiteralCompMatcher.h"
+#include "vara/Matchers/LiteralBinOpMatcher.h"
 #include "vara/Matchers/MatcherBase.h"
 #include "vara/Matchers/TemplateLiteralMatcher.h"
 
@@ -79,8 +79,8 @@ int main(int argc, const char **argv) {
   TemplateLiteralMatcher TLMatcher(RootDirectory);
   TLMatcher.registerMatcher(Finder);
 
-  LiteralCompMatcher LCMatcher(RootDirectory);
-  LCMatcher.registerMatcher(Finder);
+  LiteralBinOpMatcher LBOMatcher(RootDirectory);
+  LBOMatcher.registerMatcher(Finder);
 
   std::filesystem::path OutputPath = std::string(OutFile);
 
@@ -97,7 +97,7 @@ int main(int argc, const char **argv) {
   LCVarMatcher.mapResults(Results, LCVarMatcher.getCandidateType());
   CFMatcher.mapResults(Results, CFMatcher.getCandidateType());
   TLMatcher.mapResults(Results, TLMatcher.getCandidateType());
-  LCMatcher.mapResults(Results, LCMatcher.getCandidateType());
+  LBOMatcher.mapResults(Results, LBOMatcher.getCandidateType());
 
   std::error_code EC;
   llvm::raw_fd_ostream Ostream(OutputPath.native(), EC);
