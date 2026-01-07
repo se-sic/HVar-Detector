@@ -59,7 +59,7 @@ std::vector<FunctionLocation> LiteralBinOpMatcher::extractFunctionLocations(
   llvm::SmallVector<clang::DynTypedNode, 32> Worklist(
       llvm::iterator_range(Parents.begin(), Parents.end()));
 
-  llvm::SmallPtrSet<const clang::Decl *, 32> Visited;
+  llvm::SmallPtrSet<const void *, 32> Visited;
 
   while (!Worklist.empty()) {
     auto Node = Worklist.pop_back_val();
@@ -74,7 +74,7 @@ std::vector<FunctionLocation> LiteralBinOpMatcher::extractFunctionLocations(
     }
 
     // Prevent revisiting the same AST node
-    const clang::Decl *Key = Node.get<clang::Decl>();
+    const void *Key = Node.getMemoizationData();
     if (!Key) {
       continue;
     }
