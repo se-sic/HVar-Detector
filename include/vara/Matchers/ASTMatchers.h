@@ -63,10 +63,8 @@ const auto ConstFieldASTMatcher = // Match all variable declarations
 
 const auto
     TemplateLiteralASTMatcher = // Match Template instantiations using literals
-    classTemplateSpecializationDecl( // It is not possible to directly match the
-                                     // template parameter itself
-
-        hasAnyTemplateArgument(isIntegral()),
+    templateSpecializationTypeLoc( // It is not possible to directly match the
+                                   // template parameter itself,
         unless(isExpansionInSystemHeader()));
 
 const auto LiteralCompASTMatcher = // Match comparison expressions
