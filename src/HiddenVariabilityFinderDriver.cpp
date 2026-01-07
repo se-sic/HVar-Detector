@@ -97,6 +97,7 @@ int main(int argc, const char **argv) {
   LCVarMatcher.mapResults(Results, LCVarMatcher.getCandidateType());
   CFMatcher.mapResults(Results, CFMatcher.getCandidateType());
   TLMatcher.mapResults(Results, TLMatcher.getCandidateType());
+  LCMatcher.mapResults(Results, LCMatcher.getCandidateType());
 
   std::error_code EC;
   llvm::raw_fd_ostream Ostream(OutputPath.native(), EC);

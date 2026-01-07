@@ -1,7 +1,3 @@
-//
-// Created by abeltluk on 10/30/25.
-//
-
 #ifndef HIDDEN_CONFIGURABILITY_LITERALCOMPMATCHER_H
 #define HIDDEN_CONFIGURABILITY_LITERALCOMPMATCHER_H
 #include <filesystem>
