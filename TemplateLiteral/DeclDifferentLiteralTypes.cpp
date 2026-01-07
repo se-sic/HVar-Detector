@@ -14,7 +14,7 @@
 // Instantiate templates with different literal types
 IntLiteralTemplate<42> it1;
 // CHECK: Filename
-// CHECK-SAME: DifferentLiteralTypes.cpp
+// CHECK-SAME: DeclDifferentLiteralTypes.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 15
 // CHECK: TemplateClassName
@@ -22,7 +22,7 @@ IntLiteralTemplate<42> it1;
 
 LongLiteralTemplate<42l> lt1;
 // CHECK: Filename
-// CHECK-SAME: DifferentLiteralTypes.cpp
+// CHECK-SAME: DeclDifferentLiteralTypes.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 23
 // CHECK: TemplateClassName
@@ -30,7 +30,7 @@ LongLiteralTemplate<42l> lt1;
 
 UnsignedLiteralTemplate<42u> ut1;
 // CHECK: Filename
-// CHECK-SAME: DifferentLiteralTypes.cpp
+// CHECK-SAME: DeclDifferentLiteralTypes.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 31
 // CHECK: TemplateClassName
@@ -38,7 +38,7 @@ UnsignedLiteralTemplate<42u> ut1;
 
 ULongLiteralTemplate<42UL> ult1;
 // CHECK: Filename
-// CHECK-SAME: DifferentLiteralTypes.cpp
+// CHECK-SAME: DeclDifferentLiteralTypes.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 39
 // CHECK: TemplateClassName
@@ -46,7 +46,7 @@ ULongLiteralTemplate<42UL> ult1;
 
 CharLiteral<'x'> ch1;
 // CHECK: Filename
-// CHECK-SAME: DifferentLiteralTypes.cpp
+// CHECK-SAME: DeclDifferentLiteralTypes.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 47
 // CHECK: TemplateClassName
@@ -54,7 +54,7 @@ CharLiteral<'x'> ch1;
 
 WCharLiteral<L'x'> wch1;
 // CHECK: Filename
-// CHECK-SAME: DifferentLiteralTypes.cpp
+// CHECK-SAME: DeclDifferentLiteralTypes.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 55
 // CHECK: TemplateClassName
@@ -62,7 +62,7 @@ WCharLiteral<L'x'> wch1;
 
 BoolLiteral<true> b1;
 // CHECK: Filename
-// CHECK-SAME: DifferentLiteralTypes.cpp
+// CHECK-SAME: DeclDifferentLiteralTypes.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 63
 // CHECK: TemplateClassName
@@ -70,7 +70,7 @@ BoolLiteral<true> b1;
 
 // FloatLiteral<3.14f> f1; // Disabled due to limited compiler support
 // XCHECK: Filename
-// XCHECK-SAME: DifferentLiteralTypes.cpp
+// XCHECK-SAME: DeclDifferentLiteralTypes.cpp
 // XCHECK-NEXT: Lineno
 // XCHECK-SAME: 71
 // XCHECK: TemplateClassName
@@ -78,7 +78,7 @@ BoolLiteral<true> b1;
 
 // DoubleLiteral<2.718> d1; // Disabled due to limited compiler support
 // XCHECK: Filename
-// XCHECK-SAME: DifferentLiteralTypes.cpp
+// XCHECK-SAME: DeclDifferentLiteralTypes.cpp
 // XCHECK-NEXT: Lineno
 // XCHECK-SAME: 79
 // XCHECK: TemplateClassName
@@ -86,7 +86,7 @@ BoolLiteral<true> b1;
 
 EnumLiteralTemplate<EnumLiteral::Value1> el1;
 // CHECK: Filename
-// CHECK-SAME: DifferentLiteralTypes.cpp
+// CHECK-SAME: DeclDifferentLiteralTypes.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 87
 // CHECK: TemplateClassName

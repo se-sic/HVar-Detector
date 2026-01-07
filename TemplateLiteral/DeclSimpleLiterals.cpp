@@ -31,7 +31,7 @@ IntLiteralTemplate<-5> c8;
 IntLiteralTemplate<5> c9;
 // CHECK: TemplateLiteral:
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 22
 // CHECK: TemplateClassName
@@ -41,49 +41,49 @@ IntLiteralTemplate<5> c9;
 
 // c2
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 24
 
 // c3
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 25
 
 // c4
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 26
 
 // c5
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 27
 
 // c6
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 28
 
 // c7
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 29
 
 // c8
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 30
 
 // c9
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 31
 
@@ -101,7 +101,7 @@ BoolLiteral<false> b2;
 
 // CHECK for ch1 (instantiation CharLiteral<'a'> at line 100)
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 97
 // CHECK: TemplateClassName
@@ -109,7 +109,7 @@ BoolLiteral<false> b2;
 
 // CHECK for ch2 (instantiation CharLiteral<'\\n'> at line 101)
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 98
 // CHECK: TemplateClassName
@@ -117,7 +117,7 @@ BoolLiteral<false> b2;
 
 // CHECK for b1 (instantiation BoolLiteral<true> at line 102)
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 99
 // CHECK: TemplateClassName
@@ -125,7 +125,7 @@ BoolLiteral<false> b2;
 
 // CHECK for b2 (instantiation BoolLiteral<false> at line 103)
 // CHECK: Filename
-// CHECK-SAME: SimpleLiterals.cpp
+// CHECK-SAME: DeclSimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 100
 // CHECK: TemplateClassName

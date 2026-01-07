@@ -1,4 +1,4 @@
-// Tests detection in different contexts
+// Tests detection in different DeclContexts
 
 // RUN: %hvf --report-file=%t --root-dir=%S %s
 // RUN: cat %t | FileCheck %s
@@ -18,7 +18,7 @@ namespace test
     IntLiteralTemplate<7> ns_inst;
     // CHECK: TemplateLiteral:
     // CHECK: Filename
-    // CHECK-SAME: Contexts.cpp
+    // CHECK-SAME: DeclContexts.cpp
     // CHECK-NEXT: Lineno
     // CHECK-SAME: 18
     // CHECK: TemplateClassName
@@ -28,9 +28,8 @@ namespace test
 void testFunction() {
     // Function to test context detection.
     IntLiteralTemplate<7> func_inst;
-    // CHECK: TemplateLiteral:
     // CHECK: Filename
-    // CHECK-SAME: Contexts.cpp
+    // CHECK-SAME: DeclContexts.cpp
     // CHECK-NEXT: Lineno
     // CHECK-SAME: 30
     // CHECK: TemplateClassName
@@ -43,11 +42,10 @@ class TestClass
     // Class to test context detection.
     // Add member instantiation
     IntLiteralTemplate<7> member_inst;
-    // CHECK: TemplateLiteral:
     // CHECK: Filename
-    // CHECK-SAME: Contexts.cpp
+    // CHECK-SAME: DeclContexts.cpp
     // CHECK-NEXT: Lineno
-    // CHECK-SAME: 45
+    // CHECK-SAME: 44
     // CHECK: TemplateClassName
     // CHECK-SAME: IntLiteralTemplate
 
@@ -55,11 +53,10 @@ class TestClass
 public:
     void useInMethod() {
         IntLiteralTemplate<7> method_inst;
-        // CHECK: TemplateLiteral:
         // CHECK: Filename
-        // CHECK-SAME: Contexts.cpp
+        // CHECK-SAME: DeclContexts.cpp
         // CHECK-NEXT: Lineno
-        // CHECK-SAME: 57
+        // CHECK-SAME: 55
         // CHECK: TemplateClassName
         // CHECK-SAME: IntLiteralTemplate
     }
@@ -76,10 +73,9 @@ class TestTemplateClass
 
 // Instantiation necessary, otherwise the code is not generated and thus cannot be detected.
 TestTemplateClass<void> global_templ_inst;
-// CHECK: TemplateLiteral:
 // CHECK: Filename
-// CHECK-SAME: Contexts.cpp
+// CHECK-SAME: DeclContexts.cpp
 // CHECK-NEXT: Lineno
-// CHECK-SAME: 74
+// CHECK-SAME: 71
 // CHECK: TemplateClassName
 // CHECK-SAME: IntLiteralTemplate
