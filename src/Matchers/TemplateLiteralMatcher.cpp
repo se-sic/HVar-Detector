@@ -25,14 +25,16 @@ std::unique_ptr<CandidateBase> TemplateLiteralMatcher::extractCandidate(
               toString(CandidateType::TemplateLiteral))) {
     // Get the underlying TemplateSpecializationType
     auto *TST = TSLoc->getTypePtr();
-    if (!TST)
+    if (!TST) {
       return nullptr;
+    }
 
     // Resolve template declaration for class name and parameter names
     auto TemplateName = TST->getTemplateName();
     auto *TemplateDecl = TemplateName.getAsTemplateDecl();
-    if (!TemplateDecl)
+    if (!TemplateDecl) {
       return nullptr;
+    }
     const auto *Templated = TemplateDecl->getTemplatedDecl();
     const std::string TClassName =
         Templated ? Templated->getNameAsString() : std::string();
@@ -42,22 +44,7 @@ std::unique_ptr<CandidateBase> TemplateLiteralMatcher::extractCandidate(
       const auto &Arg = TST->getArg(ArgIdx);
       const auto ArgLocInfo = TSLoc->getArgLoc(ArgIdx);
 
-      bool isIntegralLiteral = false;
-      if (Arg.getKind() == clang::TemplateArgument::Integral) {
-        isIntegralLiteral = true;
-      } else {
-        if (ArgLocInfo.getArgument().getKind() ==
-            clang::TemplateArgument::Expression) {
-          const clang::Expr *ArgExpr = ArgLocInfo.getArgument().getAsExpr();
-          if (ArgExpr) {
-            if (ArgExpr->isCXX98IntegralConstantExpr(*Result.Context) ||
-                ArgExpr->isCXX11ConstantExpr(*Result.Context)) {
-              isIntegralLiteral = true;
-            }
-          }
-        }
-      }
-      if (!isIntegralLiteral) {
+      if (!this->isIntegralLiteralTemplateArg(Arg, ArgLocInfo, Result)) {
         continue;
       }
 
@@ -98,8 +85,76 @@ std::unique_ptr<CandidateBase> TemplateLiteralMatcher::extractCandidate(
 
 std::vector<CodeLocation> TemplateLiteralMatcher::extractUsageLocations(
     const MatchFinder::MatchResult &Result) {
-  // TODO
-  return {};
+  // Generally, UsageLocations should cover all places in the template class
+  // definition where the literal template parameter is used.
+
+  // Additionally, there may be other UseLocations, such as:
+  // 1. Variable declaration of templated type with literal parameter (e.g.
+  // std::array<int, 5> arr;)
+  //    -> UsageLocations of the declared variable (Similar to
+  //    ConstVarMatcher/ConstFieldMatcher)
+  // 2. Direct uses in expressions (e.g. sizeof(TemplatedClass<5>))
+  //    -> No additional UsageLocations
+  // 3. Templated functions with literal parameters (e.g. template<int N> void
+  // func() {...}; func<5>();)
+  //    -> Might want a separate matcher to match by specialization and then
+  //    extract usage locations.
+
+  // For now, just handle the general case
+  std::vector<CodeLocation> UsageLocations;
+
+  if (auto *TSLoc =
+          Result.Nodes.getNodeAs<clang::TemplateSpecializationTypeLoc>(
+              toString(CandidateType::TemplateLiteral))) {
+    auto *TST = TSLoc->getTypePtr();
+    if (!TST) {
+      return {};
+    }
+
+    // Resolve template declaration for class name and parameter names
+    auto TemplateName = TST->getTemplateName();
+    auto *TemplateDecl = TemplateName.getAsTemplateDecl();
+    if (!TemplateDecl) {
+      return {};
+    }
+    const auto *Templated = TemplateDecl->getTemplatedDecl();
+
+    if (!Templated) {
+      return {};
+    }
+
+    const auto *TDeclParams = TemplateDecl->getTemplateParameters();
+
+    // Iterate over all template arguments to identify integral literal
+    // arguments
+    for (unsigned ArgIdx = 0; ArgIdx < TSLoc->getNumArgs(); ++ArgIdx) {
+      if (ArgIdx >= TDeclParams->size()) {
+        return UsageLocations;
+      }
+
+      const auto &Arg = TSLoc->getTypePtr()->getArg(ArgIdx);
+      const auto ArgLocInfo = TSLoc->getArgLoc(ArgIdx);
+
+      if (!this->isIntegralLiteralTemplateArg(Arg, ArgLocInfo, Result)) {
+        continue;
+      }
+
+      const auto *NTParam = llvm::dyn_cast<clang::NonTypeTemplateParmDecl>(
+          TDeclParams->getParam(ArgIdx));
+      if (!NTParam) {
+        continue;
+      }
+
+      auto ParamUseMatcher =
+          declRefExpr(to(nonTypeTemplateParmDecl(equalsNode(NTParam))))
+              .bind("paramUse");
+      MatchFinder Finder;
+
+      // TODO
+    }
+  }
+
+  return UsageLocations;
 }
 
 std::vector<FunctionLocation> TemplateLiteralMatcher::extractFunctionLocations(
@@ -107,4 +162,26 @@ std::vector<FunctionLocation> TemplateLiteralMatcher::extractFunctionLocations(
   return {};
 }
 
+bool TemplateLiteralMatcher::isIntegralLiteralTemplateArg(
+    const clang::TemplateArgument &Arg,
+    const clang::TemplateArgumentLoc &ArgLocInfo,
+    const MatchFinder::MatchResult &Result) {
+  bool isIntegralLiteral = false;
+  if (Arg.getKind() == clang::TemplateArgument::Integral) {
+    isIntegralLiteral = true;
+  } else {
+    if (ArgLocInfo.getArgument().getKind() ==
+        clang::TemplateArgument::Expression) {
+      const clang::Expr *ArgExpr = ArgLocInfo.getArgument().getAsExpr();
+      if (ArgExpr) {
+        if (ArgExpr->isCXX98IntegralConstantExpr(*Result.Context) ||
+            ArgExpr->isCXX11ConstantExpr(*Result.Context)) {
+          isIntegralLiteral = true;
+        }
+      }
+    }
+  }
+
+  return isIntegralLiteral;
+}
 } // namespace vara

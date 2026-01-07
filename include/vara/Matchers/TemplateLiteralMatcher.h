@@ -27,6 +27,12 @@ protected:
   extractUsageLocations(const MatchFinder::MatchResult &Result) override;
   std::vector<FunctionLocation>
   extractFunctionLocations(const MatchFinder::MatchResult &Result) override;
+
+private:
+  static bool
+  isIntegralLiteralTemplateArg(const clang::TemplateArgument &Arg,
+                               const clang::TemplateArgumentLoc &ArgLocInfo,
+                               const MatchFinder::MatchResult &Result);
 };
 
 } // namespace vara

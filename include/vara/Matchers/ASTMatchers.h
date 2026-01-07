@@ -61,6 +61,8 @@ const auto
     TemplateLiteralASTMatcher = // Match Template instantiations using literals
     templateSpecializationTypeLoc( // It is not possible to directly match the
                                    // template parameter itself,
+        // hasAncestor(varDecl()), // Additional constraint: only match if used
+        // in VarDecl?
         unless(isExpansionInSystemHeader()));
 
 const auto LiteralCompASTMatcher = // Match comparison expressions
