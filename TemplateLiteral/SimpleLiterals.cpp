@@ -9,8 +9,7 @@
 // CHECK: ConstField:
 // CHECK-SAME: []
 class string;
-template<long T> struct C {};
-
+#include "Common.h"
 template <typename T> struct D{};
 
 template <>
@@ -18,24 +17,25 @@ struct D<string> {
   static const int value = 100;
 };
 
+
 D<int> d;
-C<5> c1;
+IntLiteralTemplate<5> c1;
 // Instantiate with different basic types
-C<5u> c2;
-C<5l> c3;
-C<5UL> c4;
-C<0x5> c5;
-C<0b101> c6;
-C<012> c7;
-C<-5> c8;
-C<5z> c9;
+IntLiteralTemplate<5u> c2;
+IntLiteralTemplate<5l> c3;
+IntLiteralTemplate<5UL> c4;
+IntLiteralTemplate<0x5> c5;
+IntLiteralTemplate<0b101> c6;
+IntLiteralTemplate<012> c7;
+IntLiteralTemplate<-5> c8;
+IntLiteralTemplate<5> c9;
 // CHECK: TemplateLiteral:
 // CHECK: Filename
 // CHECK-SAME: SimpleLiterals.cpp
 // CHECK-NEXT: Lineno
 // CHECK-SAME: 22
 // CHECK: TemplateClassName
-// CHECK-SAME: C
+// CHECK-SAME: IntLiteralTemplate
 // CHECK: TemplateParameterName
 // CHECK-SAME: T
 
@@ -90,8 +90,8 @@ C<5z> c9;
 
 
 // Additional template classes that accept literal non-type template parameters
-template <char C> struct CharLiteral {};
-template <bool B> struct BoolLiteral {};
+
+
 
 // Instantiate with character and boolean literals
 CharLiteral<'a'> ch1;
