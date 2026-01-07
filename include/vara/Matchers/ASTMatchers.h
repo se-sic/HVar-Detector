@@ -1,7 +1,3 @@
-//
-// Created by abeltluk on 7/16/24.
-//
-
 #ifndef HIDDEN_CONFIGURABILITY_MATCHERS_H
 #define HIDDEN_CONFIGURABILITY_MATCHERS_H
 
