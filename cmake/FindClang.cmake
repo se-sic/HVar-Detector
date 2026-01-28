@@ -1,0 +1,62 @@
+# Detect CLANG
+if(NOT LLVM_INCLUDE_DIR OR NOT LLVM_LIB_DIR)
+  message(FATAL_ERROR "No LLVM and Clang support requires LLVM")
+else(NOT LLVM_INCLUDE_DIR OR NOT LLVM_LIB_DIR)
+
+  # Finds and adds a Clang library to CLANG_LIBS
+  macro(FIND_AND_ADD_CLANG_LIB libname_)
+    find_library(
+      CLANG_${libname_}_LIB ${libname_} ${LLVM_LIB_DIR} ${CLANG_LIB_DIR}
+    )
+    if(CLANG_${libname_}_LIB)
+      set(CLANG_LIBS ${CLANG_LIBS} ${CLANG_${libname_}_LIB})
+    endif(CLANG_${libname_}_LIB)
+  endmacro(FIND_AND_ADD_CLANG_LIB)
+
+  set(CLANG_INCLUDE_DIRS ${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIR})
+  set(CLANG_INCLUDE_DIRS ${CLANG_INCLUDE_DIRS} ${CLANG_INCLUDE_DIR})
+
+  find_and_add_clang_lib(clangFrontend)
+  find_and_add_clang_lib(clangDriver)
+  find_and_add_clang_lib(clangCodeGen)
+  find_and_add_clang_lib(clangSema)
+  find_and_add_clang_lib(clangChecker)
+  find_and_add_clang_lib(clangAnalysis)
+  find_and_add_clang_lib(clangRewrite)
+  find_and_add_clang_lib(clangAST)
+  find_and_add_clang_lib(clangParse)
+  find_and_add_clang_lib(clangLex)
+  find_and_add_clang_lib(clangBasic)
+  find_and_add_clang_lib(clangARCMigrate)
+  find_and_add_clang_lib(clangEdit)
+  find_and_add_clang_lib(clangFrontendTool)
+  find_and_add_clang_lib(clangRewrite)
+  find_and_add_clang_lib(clangSerialization)
+  find_and_add_clang_lib(clangTooling)
+  find_and_add_clang_lib(clangStaticAnalyzerCheckers)
+  find_and_add_clang_lib(clangStaticAnalyzerCore)
+  find_and_add_clang_lib(clangStaticAnalyzerFrontend)
+  find_and_add_clang_lib(clangSema)
+  find_and_add_clang_lib(clangRewriteCore)
+  # clang 3.7
+  find_and_add_clang_lib(clangRewriteFrontend)
+  find_and_add_clang_lib(clangASTMatchers)
+  find_and_add_clang_lib(clangToolingCore)
+
+  find_and_add_clang_lib(clang-cpp)
+
+  message(STATUS "Clang libs: " ${CLANG_LIBS})
+
+  if(CLANG_LIBS)
+    set(CLANG_FOUND TRUE)
+  endif(CLANG_LIBS)
+
+  if(CLANG_FOUND)
+    message(STATUS "Found Clang: ${CLANG_INCLUDE_DIRS}")
+  else(CLANG_FOUND)
+    if(CLANG_FIND_REQUIRED)
+      message(FATAL_ERROR "Could NOT find Clang")
+    endif(CLANG_FIND_REQUIRED)
+  endif(CLANG_FOUND)
+
+endif(NOT LLVM_INCLUDE_DIR OR NOT LLVM_LIB_DIR)
