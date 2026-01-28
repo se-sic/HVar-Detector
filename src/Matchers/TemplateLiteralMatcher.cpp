@@ -174,6 +174,9 @@ bool TemplateLiteralMatcher::isIntegralLiteralTemplateArg(
         clang::TemplateArgument::Expression) {
       const clang::Expr *ArgExpr = ArgLocInfo.getArgument().getAsExpr();
       if (ArgExpr) {
+        if (ArgExpr->isValueDependent()) {
+          return false;
+        }
         if (ArgExpr->isCXX98IntegralConstantExpr(*Result.Context) ||
             ArgExpr->isCXX11ConstantExpr(*Result.Context)) {
           isIntegralLiteral = true;
