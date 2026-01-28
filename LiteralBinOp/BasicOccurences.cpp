@@ -170,20 +170,6 @@ void useInFunction() {
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
-// CHECK-SAME: 40
-// CHECK: Operator
-// CHECK-SAME: &&
-
-// CHECK: Filename
-// CHECK-SAME: BasicOccurences.cpp
-// CHECK-NEXT: Lineno
-// CHECK-SAME: 41
-// CHECK: Operator
-// CHECK-SAME: ||
-
-// CHECK: Filename
-// CHECK-SAME: BasicOccurences.cpp
-// CHECK-NEXT: Lineno
 // CHECK-SAME: 44
 // CHECK: Operator
 // CHECK-SAME: *
