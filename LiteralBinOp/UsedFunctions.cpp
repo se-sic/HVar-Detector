@@ -31,14 +31,13 @@ struct U {
 // CHECK: Filename
 // CHECK-SAME: UsedFunctions.cpp
 // CHECK-NEXT: Lineno
-// CHECK-SAME: 18
+// CHECK-SAME: 17
 // CHECK: FunctionName
 // CHECK-SAME: freeFunctionUse
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: UsedFunctions.cpp
 // CHECK-NEXT: Lineno
-// CHECK-SAME: 25
+// CHECK-SAME: 24
 // CHECK: FunctionName
 // CHECK-SAME: U::methodUse

@@ -62,7 +62,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: +
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -70,7 +69,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: -
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -78,7 +76,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: *
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -86,7 +83,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: /
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -94,7 +90,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: %
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -102,7 +97,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: &
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -110,7 +104,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: |
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -118,7 +111,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: ^
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -126,7 +118,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: <<
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -134,7 +125,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: >>
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -142,7 +132,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: <
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -150,7 +139,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: >
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -158,7 +146,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: <=
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -166,7 +153,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: >=
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -174,7 +160,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: ==
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -182,7 +167,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: !=
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -190,7 +174,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: &&
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -198,7 +181,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: ||
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -206,7 +188,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: *
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -214,7 +195,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: +
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
@@ -222,7 +202,6 @@ void useInFunction() {
 // CHECK: Operator
 // CHECK-SAME: +
 
-// CHECK: LiteralComp:
 // CHECK: Filename
 // CHECK-SAME: BasicOccurences.cpp
 // CHECK-NEXT: Lineno
