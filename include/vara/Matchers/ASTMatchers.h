@@ -69,6 +69,10 @@ const auto LiteralBinOpASTMatcher = // Match comparison expressions
     binaryOperation(allOf(anyOf(hasLHS(AnyLiteralType), hasRHS(AnyLiteralType)),
                           unless(hasLHS(integerLiteral(equals(0)))),
                           unless(hasRHS(integerLiteral(equals(0)))),
+                          unless(hasLHS(integerLiteral(equals(1)))),
+                          unless(hasRHS(integerLiteral(equals(1)))),
+                          unless(hasLHS(floatLiteral(equals(0.0)))),
+                          unless(hasRHS(floatLiteral(equals(0.0)))),
                           unless(isExpansionInSystemHeader())));
 
 } // namespace ast_matchers
