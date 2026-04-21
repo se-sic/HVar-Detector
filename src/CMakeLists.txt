@@ -11,7 +11,10 @@ custom_add_executable(
 
 target_link_libraries(
   hidden-variability-finder
-  PRIVATE clangAST
+  PRIVATE ${CLANG_LIBS}
+          ${LLVM_LIBS_CORE}
+          ${LLVM_LDFLAGS}
+          clangAST
           clangASTMatchers
           clangBasic
           clangFrontend

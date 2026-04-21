@@ -4,18 +4,10 @@ if((NOT DEFINED VARA_SOURCE_DIR) OR (NOT DEFINED LLVM_MAIN_SRC_DIR))
   project(hidden-variability-finder)
   cmake_minimum_required(VERSION 3.13)
 
+  # Set C++ standard
+  set(CMAKE_CXX_STANDARD 20)
+
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/)
-
-  execute_process(
-    COMMAND bash -c
-            "$VARATS_ROOT/tools/VaRA/bin/clang++ -E -x c++ - -v < /dev/null 2>&1
-      | grep \"lib/clang\" | awk '{{print $1}}' | grep include"
-    OUTPUT_VARIABLE clangBuiltInIncludePath
-  )
-
-  file(WRITE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/builtInInclude.path"
-       "${clangBuiltInIncludePath}"
-  )
 
   list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -24,14 +16,8 @@ if((NOT DEFINED VARA_SOURCE_DIR) OR (NOT DEFINED LLVM_MAIN_SRC_DIR))
     add_executable(${name} ${ARGN})
   endmacro()
 
-  find_package(LLVM REQUIRED CONFIG)
-  find_package(
-    Clang
-    REQUIRED
-    CONFIG
-    HINTS
-    ${CLANG_INSTALL_ROOT}
-  )
+  find_package(LLVM REQUIRED)
+  find_package(Clang REQUIRED)
 else()
   include_directories("${CMAKE_SOURCE_DIR}/../clang/include")
   # Custom add executable macro
