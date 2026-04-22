@@ -1,8 +1,8 @@
 if((NOT DEFINED VARA_SOURCE_DIR) OR (NOT DEFINED LLVM_MAIN_SRC_DIR))
   # Support out of tree builds independent of VARA and LLVM Loosely based on
   # https://github.com/firolino/clang-tool/
-  project(hidden-variability-finder)
   cmake_minimum_required(VERSION 3.13)
+  project(hidden-variability-finder)
 
   # Set C++ standard
   set(CMAKE_CXX_STANDARD 20)
