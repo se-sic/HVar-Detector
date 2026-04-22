@@ -46,7 +46,7 @@ else()
     message(FATAL_ERROR "llvm-lit executable at ${LLVM_LIT_EXECUTABLE} is not valid or not executable. This might impact the test suite. Please set LLVM_LIT_EXECUTABLE to a valid and executable path.")
 endif()
 
-set(LLVM_EXTERNAL_LIT ${LLVM_LIT_EXECUTABLE})
+set(LLVM_EXTERNAL_LIT ${LLVM_LIT_EXECUTABLE} CACHE INTERNAL "Path to llvm-lit executable for use in test suite")
 message(STATUS "Using llvm-lit executable at ${LLVM_EXTERNAL_LIT}")
 
 configure_lit_site_cfg(
