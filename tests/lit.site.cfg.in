@@ -1,0 +1,14 @@
+@LIT_SITE_CFG_IN_HEADER@
+
+config.llvm_tools_dir = "@LLVM_TOOLS_DIR@"
+config.hvf_tools_dir = "@HVARDETECTOR_BINARY_DIR@"
+
+import lit.llvm
+lit.llvm.initialize(lit_config, config)
+
+if config.hvf_tools_dir is not None:
+    path = os.path.pathsep.join([config.hvf_tools_dir + "/bin", config.environment['PATH']])
+    config.environment['PATH'] = path
+
+# Let the main config do the real work.
+lit_config.load_config(config, "@HVARDETECTOR_SOURCE_DIR@/tests/lit.cfg")
