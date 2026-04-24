@@ -1,3 +1,4 @@
+list(APPEND HVAR_TESTS_DEPENDS hidden-variability-finder)
 
 if(NOT IN_VARA_BUILD)
 # Special setup required to correctly setup llvm-lit and FileCheck
@@ -55,10 +56,13 @@ configure_lit_site_cfg(
         MAIN_CONFIG
         ${CMAKE_CURRENT_SOURCE_DIR}/lit.cfg
 )
+
+# Append the test dependencies to the global variable, so that it can be used in the main test suite
+list(APPEND HVAR_TESTS_DEPENDS FileCheck-symlink)
 endif ()
 
 add_lit_testsuite(
         check-hidden-var-finder "Running Hidden Variability regression tests"
         ${CMAKE_CURRENT_BINARY_DIR}
-        DEPENDS FileCheck-symlink hidden-variability-finder
+        DEPENDS ${HVAR_TESTS_DEPENDS}
 )

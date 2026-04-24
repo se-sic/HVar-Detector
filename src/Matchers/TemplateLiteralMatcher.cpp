@@ -41,8 +41,8 @@ std::unique_ptr<CandidateBase> TemplateLiteralMatcher::extractCandidate(
 
     // Iterate TemplateArgumentLocs to find non-type integral arguments.
     for (unsigned ArgIdx = 0; ArgIdx < TSLoc->getNumArgs(); ++ArgIdx) {
-      const auto &Arg = TST->getArg(ArgIdx);
       const auto ArgLocInfo = TSLoc->getArgLoc(ArgIdx);
+      const auto &Arg = ArgLocInfo.getArgument();
 
       if (!this->isIntegralLiteralTemplateArg(Arg, ArgLocInfo, Result)) {
         continue;
@@ -131,9 +131,8 @@ std::vector<CodeLocation> TemplateLiteralMatcher::extractUsageLocations(
       if (ArgIdx >= TDeclParams->size()) {
         return UsageLocations;
       }
-
-      const auto &Arg = TSLoc->getTypePtr()->getArg(ArgIdx);
       const auto ArgLocInfo = TSLoc->getArgLoc(ArgIdx);
+      const auto &Arg = ArgLocInfo.getArgument();
 
       if (!this->isIntegralLiteralTemplateArg(Arg, ArgLocInfo, Result)) {
         continue;

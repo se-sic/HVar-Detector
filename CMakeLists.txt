@@ -1,4 +1,7 @@
+message(STATUS "Configuring Hidden Variability Finder...")
+
 if((NOT DEFINED VARA_SOURCE_DIR) OR (NOT DEFINED LLVM_MAIN_SRC_DIR))
+  message(STATUS "Configuring for out-of-tree build without VARA or LLVM")
   # Support out of tree builds independent of VARA and LLVM Loosely based on
   # https://github.com/firolino/clang-tool/
   cmake_minimum_required(VERSION 3.13)
@@ -19,7 +22,11 @@ if((NOT DEFINED VARA_SOURCE_DIR) OR (NOT DEFINED LLVM_MAIN_SRC_DIR))
   find_package(LLVM REQUIRED CONFIG)
   find_package(Clang REQUIRED CONFIG)
 else()
-  include_directories("${CMAKE_SOURCE_DIR}/../clang/include")
+  message(STATUS "Configuring for in-tree build with VARA and LLVM")
+  # Include path for tablegen Clang headers, which are required for the build.
+  include_directories("${VARA_BINARY_DIR}/../clang/include")
+  include_directories("${VARA_SOURCE_DIR}/../clang/include")
+
   # Custom add executable macro
   macro(CUSTOM_ADD_EXECUTABLE name)
     add_vara_executable(${name} ${ARGN})
@@ -33,9 +40,8 @@ set(HVARDETECTOR_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
 # LLVM Includes
 include_directories(${LLVM_INCLUDE_DIR})
-# Generated Clang includes
-include_directories(${CLANG_INCLUDE_DIR})
 # Standard Clang includes
+include_directories(${CLANG_INCLUDE_DIR})
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS_LIST})
 # Add LLVM's cmake modules
