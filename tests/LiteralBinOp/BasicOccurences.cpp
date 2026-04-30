@@ -15,7 +15,7 @@
 #include <cmath>
 
 // Global arithmetic occurrences
-int g_add = 1 + 2;
+int g_add = 3 + 2;
 int g_sub = 10 - 3;
 int g_mul = 4 * 5;
 int g_div = 20 / 4;
@@ -25,7 +25,7 @@ int g_mod = 10 % 3;
 int g_and = 0b1010 & 0xff;
 int g_or = 0xF0 | 0x0F;
 int g_xor = 0xAA ^ 0x55;
-int g_shl = 1 << 4;
+int g_shl = 2 << 4;
 int g_shr = 0x80 >> 2;
 
 // Comparisons
@@ -37,8 +37,8 @@ bool g_eq = (5 == 5);
 bool g_ne = (5 != 6);
 
 // Logical
-bool g_land = (1 && 0);
-bool g_lor = (0 || 1);
+bool g_land = (12 && 8);
+bool g_lor = (12 || 34);
 
 // Floating point
 float g_fmul = 1.5f * 2.0f;

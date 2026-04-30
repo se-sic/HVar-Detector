@@ -14,7 +14,7 @@
 
 // Free function that uses literals in binary operations
 void freeFunctionUse() {
-  int x = 1 + 4;
+  int x = 2 + 4;
   (void)x;
 }
 
