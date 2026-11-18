@@ -1,14 +1,13 @@
 list(APPEND HVAR_TESTS_DEPENDS hidden-variability-finder)
 
 if(NOT IN_VARA_BUILD)
-# Special setup required to correctly setup llvm-lit and FileCheck
-set(LLVM_LIT_EXECUTABLE "" CACHE STRING "Path to llvm-lit executable")
-set(LLVM_FILECHECK_EXECUTABLE "" CACHE STRING "Path to FileCheck executable")
+# Special setup required to correctly setup llvm-lit and FileCheck. Both can be
+# provided via LLVM_LIT_EXECUTABLE and LLVM_FILECHECK_EXECUTABLE.
 
 # In the build directory create symlinks to the provided executables
 if(NOT LLVM_LIT_EXECUTABLE)
     # Try to find llvm-lit in the system path
-    find_program(LLVM_LIT_EXECUTABLE llvm-lit)
+    find_program(LLVM_LIT_EXECUTABLE llvm-lit DOC "Path to llvm-lit executable")
     if(NOT LLVM_LIT_EXECUTABLE)
         message(WARNING "No llvm-lit executable provided and not found in system path. This might impact the test suite. Please set LLVM_LIT_EXECUTABLE to the path of llvm-lit.")
     else()
@@ -19,13 +18,20 @@ endif ()
 # In the build directory create symlinks to the provided executables
 if(NOT LLVM_FILECHECK_EXECUTABLE)
     # Try to find FileCheck in the system path
-    find_program(LLVM_FILECHECK_EXECUTABLE FileCheck)
+    find_program(LLVM_FILECHECK_EXECUTABLE FileCheck DOC "Path to FileCheck executable")
     if(NOT LLVM_FILECHECK_EXECUTABLE)
         message(WARNING "No FileCheck executable provided and not found in system path. This might impact the test suite. Please set LLVM_FILECHECK_EXECUTABLE to the path of FileCheck.")
     else()
         message(STATUS "Found FileCheck executable at ${LLVM_FILECHECK_EXECUTABLE}")
     endif()
 endif ()
+
+# llvm-lit and FileCheck are only needed for the test suite. Without them, skip
+# the test setup so that the tool itself can still be built.
+if(NOT LLVM_LIT_EXECUTABLE OR NOT LLVM_FILECHECK_EXECUTABLE)
+    message(STATUS "Skipping test suite: target check-hidden-var-finder will not be available")
+    return()
+endif()
 
 message(STATUS "Using FileCheck executable at ${LLVM_FILECHECK_EXECUTABLE}")
 message(STATUS "Creating symlink to FileCheck in build directory at ${CMAKE_CURRENT_BINARY_DIR}/FileCheck")
